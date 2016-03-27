@@ -1,8 +1,11 @@
+var webpack = require('webpack');
+
 module.exports = {
-  entry: './app/index.js',
+  entry: './app/app.js',
   output: {
     filename: './bundle.js'
   },
+  target: 'node',
   devtool: 'source-map',
   module: {
     loaders: [
@@ -17,6 +20,10 @@ module.exports = {
       {
         test: /\.scss$/,
         loaders: ['style', 'css', 'sass']
+      },
+      {
+        test: /\.png/,
+        loader: 'url-loader'
       }
     ]
   },
