@@ -5,7 +5,7 @@ module.exports = {
   output: {
     filename: './bundle.js'
   },
-  target: 'node',
+  target: 'electron',
   devtool: 'source-map',
   module: {
     loaders: [

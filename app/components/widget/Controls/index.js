@@ -1,25 +1,24 @@
 import './styles/style.scss'
 import React from 'react'
-import { connect } from 'react-redux'
-
-
+import {connect} from 'react-redux'
+import Player from '../../../context/Player'
 
 class Controls extends React.Component {
   constructor() {
     super();
+
+    this.player = Player.getInstance();
   }
 
   togglePlayPause() {
+    this.player.toggle();
+
     this.props.dispatch({
       type: 'TOGGLE_PLAY'
     });
   }
 
   render() {
-    // window.player = AV.Player.fromFile(`${window.__dirname}/file.flac`);
-    //player.play();
-
-
     return (
       <div className="cmp-widget cmp-widget-controls">
         <div className="controls">

@@ -40,7 +40,10 @@
     "webpack": "^1.12.14"
   },
   "dependencies": {
+    "aac": "^0.1.2",
+    "alac": "^0.1.0",
     "av": "^0.4.8",
+    "es6-module-loader": "^0.17.11",
     "flac.js": "^0.2.1",
     "ogg.js": "^0.1.0",
     "react": "^0.14.7",
