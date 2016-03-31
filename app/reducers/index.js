@@ -1,11 +1,13 @@
 const initObject = {
   isPlaying: false,
   playing: {
-    album: null,
     artist: null,
+    album: null,
     track: null
   },
   selected: {
+    artist: null,
+    album: null,
     track: null
   }
 };
@@ -36,6 +38,13 @@ function mainReducer(state = initObject, action) {
     case 'TOGGLE_PLAY':
       return Object.assign({}, state, {
         isPlaying: !state.isPlaying
+      });
+
+    case 'SET_SELECTED_ARTIST':
+      return Object.assign({}, state, {
+        selected: {
+          artist: action.value
+        }
       });
 
     case 'SET_SELECTED_TRACK':

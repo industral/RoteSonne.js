@@ -42,6 +42,7 @@
   "dependencies": {
     "aac": "^0.1.2",
     "alac": "^0.1.0",
+    "async": "^2.0.0-rc.2",
     "av": "^0.4.8",
     "es6-module-loader": "^0.17.11",
     "flac.js": "^0.2.1",
@@ -50,6 +51,7 @@
     "react-dom": "^0.14.7",
     "react-redux": "^4.4.1",
     "react-router": "^2.0.1",
-    "redux": "^3.3.1"
+    "redux": "^3.3.1",
+    "wrench": "^1.5.8"
   }
 }

@@ -21,13 +21,14 @@ import LibraryProcess from './components/widget/LibraryProcess'
 
 __openLibrary.cb = function() {
 
-  dialog.showOpenDialog({properties: ['openFile', 'openDirectory', 'multiSelections']}, function(d) {
-    console.log(d);
+  dialog.showOpenDialog({
+    properties: ['openDirectory']
+  }, function(path) {
+    render(
+      <Provider store={window._store}>
+        <LibraryProcess path={path} />
+      </Provider>, document.getElementById('dynamic'));
   });
-
-  render(<Provider store={window._store}>
-    <LibraryProcess />
-  </Provider>, document.getElementById('dynamic'));
 };
 
 render(
