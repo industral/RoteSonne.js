@@ -2,7 +2,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
-import db from '../../../context/db'
+import database from '../../../context/db'
 
 class AlbumList extends React.Component {
   constructor() {
@@ -18,64 +18,42 @@ class AlbumList extends React.Component {
    *
    * @returns {Promise}
    */
-  getAlbumList() {
-    let selectedArtist = this.props.store.selected.artist;
-
-    let result = [];
-    let request = db.open();
+  getAlbumList(props) {
+    let selectedArtist = props.store.selected.artist;
+    let db = database.open();
 
     return new Promise((resolve, reject) => {
-      request.onsuccess = (event) => {
-        let tx = event.target.result.transaction('library', 'readonly');
-        let store = tx.objectStore('library');
-        let index = store.index('artist, album');
-        // index.getAll(selectedArtist).onsuccess = (event) => {
-        //   console.log(event);
-        // };
+      db.all("SELECT album FROM playlist WHERE artist = ? GROUP BY album", [selectedArtist], function(error, results) {
+        if (results) {
+          console.debug(results);
+          resolve(results);
+        } else {
+          console.error(error);
 
-        index.openCursor(IDBKeyRange.only([selectedArtist, "Hunter"]), 'nextunique').onsuccess = (event) => {
-          let cursor = event.target.result;
-          if (cursor) {
-          console.log(cursor);
-            // result.push(cursor.key);
-
-            cursor.continue();
-          }
-        };
-
-        tx.oncomplete = () => {
-          db.close();
-
-          resolve(result);
-        };
-
-        tx.onabort = () => {
-          console.error(tx.error);
-
-          reject(tx.error);
-        };
-      };
+          reject(error);
+        }
+      });
     });
   }
 
   render() {
-    this.getAlbumList();
-
-    // .then((data) => {
-    //   this.setState({
-    //     albums: data.map((value, index) => {
-    //       return <option value={value} key={index}>{value}</option>;
-    //     })
-    //   });
-    // });
-
     return (
       <div className="cmp-widget cmp-widget-album-list">
         <select size="15">
-
+          {this.state.albums}
         </select>
       </div>
     )
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.getAlbumList(nextProps).then((data) => {
+      this.setState({
+        albums: data.map((value, index) => {
+          return <option value={value.album} key={index}>{value.album}</option>;
+        })
+      });
+    });
   }
 }
 

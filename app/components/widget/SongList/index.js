@@ -30,26 +30,26 @@ class SongList extends React.Component {
   }
 
   getPlayList() {
-    let request = db.open();
-
-    request.onsuccess = (event) => {
-      let tx = event.target.result.transaction('library', 'readonly');
-      let store = tx.objectStore('library');
-
-      // let store.getAll().result);
-
-      // library.forEach((value) => {
-      //   store.put(value);
-      // });
-
-      tx.oncomplete = () => {
-        db.close();
-      };
-
-      tx.onabort = () => {
-        console.error(tx.error);
-      };
-    };
+    // let request = db.open();
+    //
+    // request.onsuccess = (event) => {
+    //   let tx = event.target.result.transaction('library', 'readonly');
+    //   let store = tx.objectStore('library');
+    //
+    //   // let store.getAll().result);
+    //
+    //   // library.forEach((value) => {
+    //   //   store.put(value);
+    //   // });
+    //
+    //   tx.oncomplete = () => {
+    //     db.close();
+    //   };
+    //
+    //   tx.onabort = () => {
+    //     console.error(tx.error);
+    //   };
+    // };
   }
 
   render() {

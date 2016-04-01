@@ -2,7 +2,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
 
-import db from '../../../context/db'
+import database from '../../../context/db'
 
 class ArtistList extends React.Component {
   constructor() {
@@ -19,36 +19,19 @@ class ArtistList extends React.Component {
    * @returns {Promise}
    */
   getPlayList() {
-    let result = [];
-    let request = db.open();
+    let db = database.open();
 
     return new Promise((resolve, reject) => {
-      request.onsuccess = (event) => {
-        let tx = event.target.result.transaction('library', 'readonly');
-        let store = tx.objectStore('library');
-        let index = store.index('artist');
+      db.all("SELECT artist FROM playlist GROUP BY artist", function(error, results) {
+        if (results) {
+          console.debug(results);
+          resolve(results);
+        } else {
+          console.error(error);
 
-        index.openCursor(null, 'nextunique').onsuccess = (event) => {
-          let cursor = event.target.result;
-          if (cursor) {
-            result.push(cursor.key);
-
-            cursor.continue();
-          }
-        };
-
-        tx.oncomplete = () => {
-          db.close();
-
-          resolve(result);
-        };
-
-        tx.onabort = () => {
-          console.error(tx.error);
-
-          reject(tx.error);
-        };
-      };
+          reject(error);
+        }
+      });
     });
   }
 
@@ -60,14 +43,6 @@ class ArtistList extends React.Component {
   }
 
   render() {
-    this.getPlayList().then((data) => {
-      this.setState({
-        artists: data.map((value, index) => {
-          return <option value={value} key={index}>{value}</option>;
-        })
-      });
-    });
-
     return (
       <div className="cmp-widget cmp-widget-artist-list">
         <select size="15" onChange={this.setSelectedArtist.bind(this)}>
@@ -75,6 +50,16 @@ class ArtistList extends React.Component {
         </select>
       </div>
     )
+  }
+
+  componentDidMount() {
+    this.getPlayList().then((data) => {
+      this.setState({
+        artists: data.map((value, index) => {
+          return <option value={value.artist} key={index}>{value.artist}</option>;
+        })
+      });
+    });
   }
 }
 

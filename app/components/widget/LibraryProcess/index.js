@@ -8,7 +8,7 @@ import async from 'async'
 
 import AV from 'av'
 
-import db from '../../../context/db'
+import database from '../../../context/db'
 
 class LibraryProcess extends React.Component {
   constructor() {
@@ -100,34 +100,13 @@ class LibraryProcess extends React.Component {
   }
 
   writeToDB(library) {
-    let request = db.open();
-
-    request.onsuccess = (event) => {
-      let tx = event.target.result.transaction('library', 'readwrite');
-      let store = tx.objectStore('library');
-      store.clear();
-
+    let db = database.open();
+    database.recreate(() => {
       library.forEach((value) => {
-        store.put(value);
+        db.run("INSERT INTO playlist (artist, album, title, file, trackNumber) VALUES (?, ?, ?, ?, ?)",
+          [value.artist, value.album, value.title, value.file, value.trackNumber]);
       });
-
-      tx.oncomplete = () => {
-        db.close();
-
-        this.setState({
-          done: true
-        });
-
-        setTimeout(() => {
-          this.done();
-        }, 1000);
-
-      };
-
-      tx.onabort = () => {
-        console.error(tx.error);
-      };
-    };
+    });
   }
 
   done() {
