@@ -32,7 +32,7 @@ class Player {
     let store = this.store.getState();
 
     if (!this.state.isPlaying) {
-      if (!this.player) {
+      if (!this.player || this.player.isStop) {
         let track = file || store.playing.track || store.selected.track;
 
         if (!track) {
@@ -52,8 +52,9 @@ class Player {
 
   stop() {
     if (this.player) {
+      this.player.pause();
       this.player.stop();
-      this.player = null;
+      this.player.isStop = true;
     }
   }
 

@@ -15,20 +15,15 @@ const initObject = {
 function mainReducer(state = initObject, action) {
   switch (action.type) {
     case 'PLAY':
-      var output = {
-        isPlaying: true
-      };
-
-      if (action.value) {
-        output.playing = Object.assign({}, output.playing, {
+      return Object.assign({}, state, {
+        isPlaying: true,
+        playing: Object.assign({}, state.playing, {
           track: action.value
-        });
-        output.selected = Object.assign({}, output.selected, {
+        }),
+        selected: Object.assign({}, state.selected, {
           track: action.value
-        });
-      }
-
-      return Object.assign({}, state, output);
+        })
+      });
 
     case 'STOP':
       return Object.assign({}, state, {
@@ -42,23 +37,30 @@ function mainReducer(state = initObject, action) {
 
     case 'SET_SELECTED_ARTIST':
       return Object.assign({}, state, {
-        selected: {
+        selected: Object.assign({}, state.selected, {
           artist: action.value
-        }
+        })
+      });
+
+    case 'SET_SELECTED_ALBUM':
+      return Object.assign({}, state, {
+        selected: Object.assign({}, state.selected, {
+          album: action.value
+        })
       });
 
     case 'SET_SELECTED_TRACK':
       return Object.assign({}, state, {
-        selected: {
+        selected: Object.assign({}, state.selected, {
           track: action.value
-        }
+        })
       });
 
     case 'SET_PLAYING_TRACK':
       return Object.assign({}, state, {
-        playing: {
+        playing: Object.assign({}, state.playing, {
           track: action.value
-        }
+        })
       });
 
     default:

@@ -36,10 +36,17 @@ class AlbumList extends React.Component {
     });
   }
 
+  setSelectedAlbum(event) {
+    this.props.dispatch({
+      type: 'SET_SELECTED_ALBUM',
+      value: event.currentTarget.value
+    });
+  }
+
   render() {
     return (
       <div className="cmp-widget cmp-widget-album-list">
-        <select size="15">
+        <select size="15" onChange={this.setSelectedAlbum.bind(this)}>
           {this.state.albums}
         </select>
       </div>

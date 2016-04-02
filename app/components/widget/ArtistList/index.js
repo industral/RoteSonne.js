@@ -22,7 +22,7 @@ class ArtistList extends React.Component {
     let db = database.open();
 
     return new Promise((resolve, reject) => {
-      db.all("SELECT artist FROM playlist GROUP BY artist", function(error, results) {
+      db.all("SELECT albumArtist as artist FROM playlist GROUP BY albumArtist", function(error, results) {
         if (results) {
           console.debug(results);
           resolve(results);

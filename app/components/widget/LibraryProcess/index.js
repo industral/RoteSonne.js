@@ -15,6 +15,7 @@ class LibraryProcess extends React.Component {
     super();
 
     this.state = {};
+    this.extensions = /\.aac|\.flac|\.m4a/;
   }
 
   componentDidMount() {
@@ -45,15 +46,15 @@ class LibraryProcess extends React.Component {
   getFilesInLibrary(path) {
     let output = [];
 
-    return new Promise(function(resolve) {
-      wrench.readdirRecursive(path, function(error, curFiles) {
+    return new Promise((resolve) => {
+      wrench.readdirRecursive(path, (error, curFiles) => {
         if (error) {
           console.error(error);
         } else if (curFiles) {
           output = output.concat(curFiles);
         } else {
           output = output.filter((value) => {
-            return value.match(/\.aac|\.flac|\.m4a/)
+            return value.match(this.extensions)
           });
 
           resolve(output);
@@ -70,7 +71,7 @@ class LibraryProcess extends React.Component {
         var asset = AV.Asset.fromFile(`${libraryPath}/${file}`);
         console.log(`${libraryPath}/${file}`);
 
-        asset.on('error', function(e) {
+        asset.on('error', (e) => {
           console.error(e);
 
           callback();
@@ -81,9 +82,11 @@ class LibraryProcess extends React.Component {
 
           output.push({
             file: `${libraryPath}/${file}`,
-            artist: metadata.artist,
-            album: metadata.album,
-            title: metadata.title,
+            artist: metadata.artist || 'Unknow',
+            albumArtist: metadata.albumArtist || metadata.artist || 'Unknow',
+            album: metadata.album || 'Unknow',
+            title: metadata.title || file.split('/').pop().replace(this.extensions, ''),
+            diskNumber: metadata.diskNumber,
             trackNumber: metadata.trackNumber
           });
 
@@ -102,9 +105,10 @@ class LibraryProcess extends React.Component {
   writeToDB(library) {
     let db = database.open();
     database.recreate(() => {
-      library.forEach((value) => {
-        db.run("INSERT INTO playlist (artist, album, title, file, trackNumber) VALUES (?, ?, ?, ?, ?)",
-          [value.artist, value.album, value.title, value.file, value.trackNumber]);
+      library.forEach((value, index) => {
+        db.run("INSERT INTO playlist VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+          [index, value.artist, value.albumArtist, value.album, value.title, value.file, value.diskNumber,
+            value.trackNumber]);
       });
     });
   }

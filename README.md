@@ -10,6 +10,7 @@ Rewritten version of [RoteSonne](https://github.com/industral/RoteSonne)
 
 
 ```bash
-$ npm install electron-prebuilt -g
+$ webpack -w
+$ npm i electron-prebuilt -g
 $ electron .
 ```

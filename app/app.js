@@ -9,11 +9,12 @@ import {Provider} from 'react-redux'
 import MainLayout from './components/layout/Main'
 import MainPage from './components/page/Main'
 
-import DevTools from './assets/js/DevTools'
+// import DevTools from './assets/js/DevTools'
 
 import Player from './context/Player';
 
-window._store = createStore(reducer, DevTools.instrument());
+// window._store = createStore(reducer, DevTools.instrument());
+window._store = createStore(reducer);
 
 Player.getInstance();
 

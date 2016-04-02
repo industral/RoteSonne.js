@@ -2,58 +2,71 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import Player from '../../../context/Player'
+import TrackItem from './trackItem'
 
-import db from '../../../context/db'
+import database from '../../../context/db'
 
 class SongList extends React.Component {
   constructor() {
     super();
 
+    this.state = {
+      tracks: []
+    };
+
     this.player = Player.getInstance();
   }
 
-  setSelectTrack(f) {
+  setSelectTrack(title) {
     this.props.dispatch({
       type: 'SET_SELECTED_TRACK',
-      value: f
+      value: title
     });
   }
 
-  playTrack(e) {
+  playTrack(file) {
     this.player.stop();
-    this.player.play(e);
 
-    this.props.dispatch({
-      type: 'PLAY',
-      value: e
-    });
+    // setTimeout(() => {
+      this.player.play(file);
+
+      this.props.dispatch({
+        type: 'PLAY',
+        value: file
+      });
+    // }, 5000);
+
+
   }
 
-  getPlayList() {
-    // let request = db.open();
-    //
-    // request.onsuccess = (event) => {
-    //   let tx = event.target.result.transaction('library', 'readonly');
-    //   let store = tx.objectStore('library');
-    //
-    //   // let store.getAll().result);
-    //
-    //   // library.forEach((value) => {
-    //   //   store.put(value);
-    //   // });
-    //
-    //   tx.oncomplete = () => {
-    //     db.close();
-    //   };
-    //
-    //   tx.onabort = () => {
-    //     console.error(tx.error);
-    //   };
-    // };
+  getPlayList(props) {
+    let selected = props.store.selected;
+    let db = database.open();
+
+    return new Promise((resolve, reject) => {
+      db.all("SELECT * FROM playlist WHERE albumArtist = ? and album = ?",
+        [selected.artist, selected.album], function(error, results) {
+          if (results) {
+            console.debug(results);
+            resolve(results);
+          } else {
+            console.error(error);
+
+            reject(error);
+          }
+        });
+    });
   }
 
   render() {
-    this.getPlayList();
+    var tracks = this.state.tracks.map((value, index) => {
+      return (<TrackItem
+        key={index}
+        {...value}
+        onClick={this.setSelectTrack.bind(this, value.file)}
+        onDoubleClick={this.playTrack.bind(this, value.file)}
+      />)
+    });
 
     return (
       <div className="cmp-widget cmp-widget-song-list">
@@ -65,22 +78,21 @@ class SongList extends React.Component {
             </tr>
           </thead>
           <tbody>
-            <tr
-              onClick={this.setSelectTrack.bind(this, `/Data/Music/Music/Epica/2004 - Feint/Epica - Cry For The Moon CD2/(01)_[EPICA]_Cry_For_The_Moon_(Single_Version).m4a`)}
-              onDoubleClick={this.playTrack.bind(this, `/Data/Music/Music/Epica/2004 - Feint/Epica - Cry For The Moon CD2/(01)_[EPICA]_Cry_For_The_Moon_(Single_Version).m4a`)}
-            >
-              <td>1</td>
-              <td>Test 1</td>
-            </tr>
-            <tr
-              onClick={this.setSelectTrack.bind(this, `/Data/Music/Music/Epica/2004 - Feint/Epica - Cry For The Moon CD2/(04)_[EPICA]_Run_For_A_Fall.m4a`)}>
-              <td>1</td>
-              <td>Test 1</td>
-            </tr>
+            {tracks}
           </tbody>
         </table>
       </div>
     )
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log(333, nextProps);
+    this.getPlayList(nextProps).then((data) => {
+      console.log(123, data);
+      this.setState({
+        tracks: data
+      });
+    });
   }
 }
 

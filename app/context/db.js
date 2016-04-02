@@ -4,10 +4,12 @@ var db = new sqlite3.Database('/Users/alex/rotesonne.db');
 let create = (cb) => {
   const sql = 'CREATE TABLE IF NOT EXISTS "playlist" (' +
               '`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,' +
-              '`artist` TEXT NOT NULL,' +
+              '`artist` TEXT,' +
+              '`albumArtist` TEXT NOT NULL,' +
               '`album` TEXT NOT NULL,' +
               '`title` TEXT NOT NULL,' +
               '`file` TEXT NOT NULL UNIQUE,' +
+              '`diskNumber` TEXT,' +
               '`trackNumber` TEXT)';
   db.run(sql, cb);
 };
