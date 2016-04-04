@@ -6,7 +6,8 @@
   </head>
   <body>
     <div id="app"></div>
-<div id="dynamic"></div>
+    <div id="dynamic"></div>
+
     <script>
       var remote = require('electron').remote;
       var dialog = remote.require('dialog');
@@ -26,17 +27,19 @@
               label: 'Reload',
               accelerator: 'CmdOrCtrl+R',
               click: function(item, focusedWindow) {
-                if (focusedWindow)
+                if (focusedWindow) {
                   focusedWindow.reload();
+                }
               }
             },
             {
               label: 'Toggle Full Screen',
               accelerator: (function() {
-                if (process.platform == 'darwin')
+                if (process.platform == 'darwin') {
                   return 'Ctrl+Command+F';
-                else
+                } else {
                   return 'F11';
+                }
               })(),
               click: function(item, focusedWindow) {
                 if (focusedWindow)

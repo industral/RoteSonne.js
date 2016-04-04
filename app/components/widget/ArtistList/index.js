@@ -22,44 +22,62 @@ class ArtistList extends React.Component {
     let db = database.open();
 
     return new Promise((resolve, reject) => {
-      db.all("SELECT albumArtist as artist FROM playlist GROUP BY albumArtist", function(error, results) {
-        if (results) {
-          console.debug(results);
-          resolve(results);
-        } else {
-          console.error(error);
+      db.all("SELECT albumArtist as artist, COUNT(DISTINCT album) as albums FROM playlist GROUP BY albumArtist",
+        function(error, results) {
+          if (results) {
+            console.debug(results);
+            resolve(results);
+          } else {
+            console.error(error);
 
-          reject(error);
-        }
-      });
+            reject(error);
+          }
+        });
     });
   }
 
-  setSelectedArtist(event) {
+  setSelectedArtist(value) {
     this.props.dispatch({
       type: 'SET_SELECTED_ARTIST',
-      value: event.currentTarget.value
+      value: value
     });
   }
 
   render() {
     return (
-      <div className="cmp-widget cmp-widget-artist-list">
-        <select size="15" onChange={this.setSelectedArtist.bind(this)}>
-          {this.state.artists}
-        </select>
-      </div>
+      <ul className="cmp-widget cmp-widget-artist-list list-group">
+        {this.state.artists}
+      </ul>
     )
   }
 
-  componentDidMount() {
+  createList() {
     this.getPlayList().then((data) => {
       this.setState({
         artists: data.map((value, index) => {
-          return <option value={value.artist} key={index}>{value.artist}</option>;
+          let classList = 'list-group-item ' + (this.props.store.selected.artist === value.artist ? 'active' : '');
+
+          return (
+            <li className={classList} key={index} onClick={this.setSelectedArtist.bind(this, value.artist)}
+                title={value.artist}>
+              <img className="img-circle media-object pull-left" src="/assets/img/avatar.jpg" width="32" height="32" />
+              <div className="media-body">
+                <strong>{value.artist}</strong>
+                <p>{value.albums} albums</p>
+              </div>
+            </li>
+          );
         })
       });
     });
+  }
+
+  componentDidMount() {
+    this.createList();
+  }
+
+  componentWillReceiveProps() {
+    this.createList();
   }
 }
 

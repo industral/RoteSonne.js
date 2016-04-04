@@ -23,33 +23,32 @@ class AlbumList extends React.Component {
     let db = database.open();
 
     return new Promise((resolve, reject) => {
-      db.all("SELECT album FROM playlist WHERE artist = ? GROUP BY album", [selectedArtist], function(error, results) {
-        if (results) {
-          console.debug(results);
-          resolve(results);
-        } else {
-          console.error(error);
+      db.all("SELECT album, COUNT(title) as tracks FROM playlist WHERE albumArtist = ? GROUP BY album",
+        [selectedArtist], function(error, results) {
+          if (results) {
+            console.debug(results);
+            resolve(results);
+          } else {
+            console.error(error);
 
-          reject(error);
-        }
-      });
+            reject(error);
+          }
+        });
     });
   }
 
-  setSelectedAlbum(event) {
+  setSelectedAlbum(value) {
     this.props.dispatch({
       type: 'SET_SELECTED_ALBUM',
-      value: event.currentTarget.value
+      value: value
     });
   }
 
   render() {
     return (
-      <div className="cmp-widget cmp-widget-album-list">
-        <select size="15" onChange={this.setSelectedAlbum.bind(this)}>
-          {this.state.albums}
-        </select>
-      </div>
+      <ul className="cmp-widget cmp-widget-album-list list-group">
+        {this.state.albums}
+      </ul>
     )
   }
 
@@ -57,7 +56,18 @@ class AlbumList extends React.Component {
     this.getAlbumList(nextProps).then((data) => {
       this.setState({
         albums: data.map((value, index) => {
-          return <option value={value.album} key={index}>{value.album}</option>;
+          let classList = 'list-group-item ' + (this.props.store.selected.album === value.album ? 'active' : '');
+
+          return (
+            <li className={classList} key={index} onClick={this.setSelectedAlbum.bind(this, value.album)}
+                title={value.album}>
+              <img className="img-circle media-object pull-left" src="/assets/img/avatar.jpg" width="32" height="32" />
+              <div className="media-body">
+                <strong>{value.album}</strong>
+                <p>{value.tracks} songs</p>
+              </div>
+            </li>
+          );
         })
       });
     });

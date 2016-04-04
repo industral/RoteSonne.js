@@ -1,7 +1,7 @@
 import './styles/style.scss'
 import React from 'react'
-import DevTools from '../../../assets/js/DevTools'
-
+import Controls from '../../widget/Controls'
+// import DevTools from '../../../assets/js/DevTools'
 
 class Layout extends React.Component {
   constructor() {
@@ -10,19 +10,24 @@ class Layout extends React.Component {
 
   render() {
     return (
-      <div className="cmp-layout">
-        LAYOUT
+      <div className="window cmp-layout">
+        <header className="toolbar toolbar-header">
+          <h1 className="title">RoteSonne.js</h1>
 
-        <section>
+          <Controls />
+        </header>
+
+        <section className="window-content">
           {this.props.children}
         </section>
 
         <div>
-          <DevTools />
         </div>
       </div>
     )
   }
 }
+
+// <DevTools />
 
 export default Layout;

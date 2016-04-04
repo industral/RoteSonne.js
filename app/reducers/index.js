@@ -3,12 +3,14 @@ const initObject = {
   playing: {
     artist: null,
     album: null,
-    track: null
+    title: null,
+    file: null
   },
   selected: {
     artist: null,
     album: null,
-    track: null
+    title: null,
+    file: null
   }
 };
 
@@ -18,10 +20,12 @@ function mainReducer(state = initObject, action) {
       return Object.assign({}, state, {
         isPlaying: true,
         playing: Object.assign({}, state.playing, {
-          track: action.value
+          file: action.value.file,
+          title: action.value.title
         }),
         selected: Object.assign({}, state.selected, {
-          track: action.value
+          file: action.value.file,
+          title: action.value.title
         })
       });
 
@@ -52,14 +56,16 @@ function mainReducer(state = initObject, action) {
     case 'SET_SELECTED_TRACK':
       return Object.assign({}, state, {
         selected: Object.assign({}, state.selected, {
-          track: action.value
+          title: action.value.title,
+          file: action.value.file
         })
       });
 
     case 'SET_PLAYING_TRACK':
       return Object.assign({}, state, {
         playing: Object.assign({}, state.playing, {
-          track: action.value
+          title: action.value.title,
+          file: action.value.file
         })
       });
 

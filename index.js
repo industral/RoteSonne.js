@@ -23,7 +23,11 @@ app.on('ready', function() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1400,
-    height: 900
+    height: 900,
+    minWidth: 500,
+    minHeight: 200,
+    acceptFirstMouse: true,
+    titleBarStyle: 'hidden'
   });
 
   // and load the index.html of the app.

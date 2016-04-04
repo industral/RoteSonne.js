@@ -32,7 +32,11 @@ module.exports = {
         loaders: ['style', 'css', 'sass']
       },
       {
-        test: /\.png/,
+        test: /\.css$/,
+        loaders: ['style', 'css']
+      },
+      {
+        test: /\.png|\.woff/,
         loader: 'url-loader'
       }
     ]

@@ -13,14 +13,18 @@ class Main extends React.Component {
 
   render() {
     return (
-      <div className="cmp-page">
-        PAGE
+      <div className="cmp-page pane-group">
+        <div className="pane pane-sm sidebar">
+          <ArtistList />
+        </div>
 
-        <Controls />
-        <ArtistList />
-        <AlbumList />
-        <SongList />
+        <div className="pane pane-sm sidebar">
+          <AlbumList />
+        </div>
 
+        <div className="pane">
+          <SongList />
+        </div>
       </div>
     )
   }

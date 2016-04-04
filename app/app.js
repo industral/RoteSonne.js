@@ -1,3 +1,6 @@
+import './assets/css/photon.css'
+import './assets/css/style.css'
+
 import React from 'react'
 import {Router, Route, IndexRoute, hashHistory} from 'react-router'
 import {render} from 'react-dom'
