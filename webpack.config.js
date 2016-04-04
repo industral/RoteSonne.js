@@ -10,10 +10,18 @@ fs.readdirSync('node_modules')
     nodeModules[mod] = 'commonjs ' + mod;
   });
 
+fs.readdirSync('app/node_modules')
+  .filter(function(x) {
+    return ['.bin'].indexOf(x) === -1;
+  })
+  .forEach(function(mod) {
+    nodeModules[mod] = 'commonjs ' + mod;
+  });
+
 module.exports = {
   entry: './app/app.js',
   output: {
-    filename: './bundle.js'
+    filename: './app/bundle.js'
   },
   target: 'electron',
   devtool: 'source-map',

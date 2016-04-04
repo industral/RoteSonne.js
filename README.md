@@ -10,7 +10,30 @@ Rewritten version of [RoteSonne](https://github.com/industral/RoteSonne)
 
 
 ```bash
-$ webpack -w
 $ npm i electron-prebuilt -g
-$ electron .
+$ npm i
+
+$ cd app/node_modules/av
+$ npm install && make browser
+
+$ cd ../aac
+$ npm install && make browser
+
+$ cd ../alac
+$ npm install && make browser
+
+$ cd ../flac.js
+$ npm install && make browser
+
+$ cd ../../..
+
+$ webpack -w
+$ electron app/
+```
+
+
+## Create a build
+
+```bash
+$ npm run pack
 ```
