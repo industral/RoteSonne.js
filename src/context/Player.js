@@ -14,8 +14,7 @@ class Player {
     this.player = null;
 
     this.state = {
-      isPlaying: false,
-      currentTrack: null
+      isPlaying: false
     };
 
     this.store = window._store;

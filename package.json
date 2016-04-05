@@ -27,6 +27,7 @@
       "icon": "build/icon.icns",
       "icon-size": 80,
       "background": "build/background.png",
+      "ignore": "bundle.js.map",
       "contents": [
         {
           "x": 410,

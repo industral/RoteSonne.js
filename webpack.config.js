@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var fs = require('fs');
+var path = require('path');
 
 var nodeModules = {};
 fs.readdirSync('node_modules')
@@ -19,12 +20,17 @@ fs.readdirSync('app/node_modules')
   });
 
 module.exports = {
-  entry: './app/app.js',
+  entry: './src/app.js',
   output: {
     filename: './app/bundle.js'
   },
   target: 'electron',
   devtool: 'source-map',
+  resolve: {
+    root: [
+      path.resolve('./app/node_modules')
+    ]
+  },
   module: {
     loaders: [
       {
@@ -50,7 +56,7 @@ module.exports = {
     ]
   },
   sassLoader: {
-    includePaths: ['app/assets']
+    includePaths: ['src/assets']
   },
   externals: [nodeModules]
 };
