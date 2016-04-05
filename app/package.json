@@ -4,7 +4,7 @@
   "description": "Audio Player",
   "version": "0.0.1",
   "author": "Alex Ivasyuv",
-  "productName": "RoteSonne.js",
+  "productName": "RoteSonne@js",
   "dependencies": {
     "aac": "^0.1.2",
     "alac": "^0.1.0",
