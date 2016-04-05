@@ -27,7 +27,7 @@ class LibraryProcess extends React.Component {
     return (
       <div className="cmp-widget cmp-widget-library-process">
         <div>Processing library...</div>
-        <img src="./components/widget/LibraryProcess/images/ajax-loader.gif" />
+        <progress />
       </div>
     )
   }
