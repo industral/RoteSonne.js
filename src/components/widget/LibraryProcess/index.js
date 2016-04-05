@@ -74,9 +74,9 @@ class LibraryProcess extends React.Component {
         asset.on('error', (e) => {
           console.error(e);
 
+          asset.source.stream.close();
           callback();
         });
-
         asset.get('metadata', (metadata) => {
           console.log(metadata);
 
@@ -90,6 +90,7 @@ class LibraryProcess extends React.Component {
             trackNumber: metadata.trackNumber
           });
 
+          asset.source.stream.close();
           callback();
         });
       }, (err) => {
