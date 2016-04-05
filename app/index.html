@@ -9,8 +9,11 @@
     <div id="dynamic"></div>
 
     <script>
-      var remote = require('electron').remote;
+      var electron = require('electron');
+      var remote = electron.remote;
       var dialog = remote.require('dialog');
+
+      electron.webFrame.setZoomLevelLimits(1, 1);
 
       function __openLibrary() {
         __openLibrary.cb();
@@ -20,47 +23,6 @@
       const MenuItem = remote.MenuItem;
 
       var template = [
-        {
-          label: 'View',
-          submenu: [
-            {
-              label: 'Reload',
-              accelerator: 'CmdOrCtrl+R',
-              click: function(item, focusedWindow) {
-                if (focusedWindow) {
-                  focusedWindow.reload();
-                }
-              }
-            },
-            {
-              label: 'Toggle Full Screen',
-              accelerator: (function() {
-                if (process.platform == 'darwin') {
-                  return 'Ctrl+Command+F';
-                } else {
-                  return 'F11';
-                }
-              })(),
-              click: function(item, focusedWindow) {
-                if (focusedWindow)
-                  focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
-              }
-            },
-            {
-              label: 'Toggle Developer Tools',
-              accelerator: (function() {
-                if (process.platform == 'darwin')
-                  return 'Alt+Command+I';
-                else
-                  return 'Ctrl+Shift+I';
-              })(),
-              click: function(item, focusedWindow) {
-                if (focusedWindow)
-                  focusedWindow.toggleDevTools();
-              }
-            },
-          ]
-        },
         {
           label: 'File',
           submenu: [
@@ -100,6 +62,51 @@
           ]
         }
       ];
+
+      if (process.env.DEBUG) {
+        template.unshift({
+          label: 'View',
+          submenu: [
+            {
+              label: 'Reload',
+              accelerator: 'CmdOrCtrl+R',
+              click: function(item, focusedWindow) {
+                if (focusedWindow) {
+                  focusedWindow.reload();
+                }
+              }
+            },
+            {
+              label: 'Toggle Full Screen',
+              accelerator: (function() {
+                if (process.platform == 'darwin') {
+                  return 'Ctrl+Command+F';
+                } else {
+                  return 'F11';
+                }
+              })(),
+              click: function(item, focusedWindow) {
+                if (focusedWindow) {
+                  focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
+                }
+              }
+            },
+            {
+              label: 'Toggle Developer Tools',
+              accelerator: (function() {
+                if (process.platform == 'darwin') {
+                  return 'Alt+Command+I';
+                } else
+                  return 'Ctrl+Shift+I';
+              })(),
+              click: function(item, focusedWindow) {
+                if (focusedWindow)
+                  focusedWindow.toggleDevTools();
+              }
+            }
+          ]
+        });
+      }
 
       if (process.platform == 'darwin') {
         template.unshift({
@@ -141,7 +148,7 @@
               label: 'Quit',
               accelerator: 'Command+Q',
               click: function() {
-                app.quit();
+                remote.app.quit();
               }
             }
           ]

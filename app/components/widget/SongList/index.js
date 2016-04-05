@@ -46,21 +46,23 @@ class SongList extends React.Component {
   }
 
   getPlayList(props) {
-    let selected = props.store.selected;
-    let db = database.open();
-
     return new Promise((resolve, reject) => {
-      db.all("SELECT * FROM playlist WHERE albumArtist = ? and album = ?",
-        [selected.artist, selected.album], function(error, results) {
-          if (results) {
-            console.debug(results);
-            resolve(results);
-          } else {
-            console.error(error);
 
-            reject(error);
-          }
-        });
+      let selected = props.store.selected;
+      database.open((db) => {
+        db.all("SELECT * FROM playlist WHERE albumArtist = ? and album = ?",
+          [selected.artist, selected.album], function(error, results) {
+            if (results) {
+              console.debug(results);
+              resolve(results);
+            } else {
+              console.error(error);
+
+              reject(error);
+            }
+          });
+      });
+
     });
   }
 

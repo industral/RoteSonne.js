@@ -1,5 +1,6 @@
 const initObject = {
   isPlaying: false,
+  libraryUpdated: false,
   playing: {
     artist: null,
     album: null,
@@ -67,6 +68,11 @@ function mainReducer(state = initObject, action) {
           title: action.value.title,
           file: action.value.file
         })
+      });
+
+    case 'LIBRARY_UPDATED':
+      return Object.assign({}, state, {
+        libraryUpdated: true
       });
 
     default:

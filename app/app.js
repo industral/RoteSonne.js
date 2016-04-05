@@ -27,11 +27,13 @@ __openLibrary.cb = function() {
 
   dialog.showOpenDialog({
     properties: ['openDirectory']
-  }, function(path) {
-    render(
-      <Provider store={window._store}>
-        <LibraryProcess path={path} />
-      </Provider>, document.getElementById('dynamic'));
+  }, function(files) {
+    if (files) {
+      render(
+        <Provider store={window._store}>
+          <LibraryProcess files={files} />
+        </Provider>, document.getElementById('dynamic'));
+    }
   });
 };
 
@@ -40,7 +42,6 @@ render(
     <Router history={hashHistory}>
       <Route path="/" component={MainLayout}>
         <IndexRoute component={MainPage} />
-
       </Route>
     </Router>
   </Provider>, document.getElementById('app')

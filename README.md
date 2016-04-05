@@ -14,16 +14,19 @@ $ npm i electron-prebuilt -g
 $ npm i
 
 $ cd app/node_modules/av
-$ npm install && make browser
+$ npm i && make browser
 
 $ cd ../aac
-$ npm install && make browser
+$ npm i && make browser
 
 $ cd ../alac
-$ npm install && make browser
+$ npm i && make browser
 
 $ cd ../flac.js
-$ npm install && make browser
+$ npm i && make browser
+
+$ cd ../mp3
+$ npm i && make browser
 
 $ cd ../../..
 

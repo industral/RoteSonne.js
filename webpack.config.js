@@ -44,7 +44,7 @@ module.exports = {
         loaders: ['style', 'css']
       },
       {
-        test: /\.png|\.woff/,
+        test: /\.png|\.gif|\.woff/,
         loader: 'url-loader'
       }
     ]

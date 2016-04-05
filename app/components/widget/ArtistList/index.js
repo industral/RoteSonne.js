@@ -19,20 +19,22 @@ class ArtistList extends React.Component {
    * @returns {Promise}
    */
   getPlayList() {
-    let db = database.open();
-
     return new Promise((resolve, reject) => {
-      db.all("SELECT albumArtist as artist, COUNT(DISTINCT album) as albums FROM playlist GROUP BY albumArtist",
-        function(error, results) {
-          if (results) {
-            console.debug(results);
-            resolve(results);
-          } else {
-            console.error(error);
 
-            reject(error);
-          }
-        });
+      database.open((db) => {
+        db.all("SELECT albumArtist as artist, COUNT(DISTINCT album) as albums FROM playlist GROUP BY albumArtist",
+          function(error, results) {
+            if (results) {
+              console.debug(results);
+              resolve(results);
+            } else {
+              console.error(error);
+
+              reject(error);
+            }
+          });
+      });
+
     });
   }
 
@@ -60,7 +62,6 @@ class ArtistList extends React.Component {
           return (
             <li className={classList} key={index} onClick={this.setSelectedArtist.bind(this, value.artist)}
                 title={value.artist}>
-              <img className="img-circle media-object pull-left" src="/assets/img/avatar.jpg" width="32" height="32" />
               <div className="media-body">
                 <strong>{value.artist}</strong>
                 <p>{value.albums} albums</p>

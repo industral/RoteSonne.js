@@ -1,7 +1,9 @@
-var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database('/Users/alex/rotesonne.db');
+const sqlite3 = require('sqlite3').verbose();
+const userHome = process.env.HOME || process.env.USERPROFILE;
+let db = null;
 
-let create = (cb) => {
+const create = (cb = () => {
+}) => {
   const sql = 'CREATE TABLE IF NOT EXISTS "playlist" (' +
               '`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,' +
               '`artist` TEXT,' +
@@ -14,10 +16,9 @@ let create = (cb) => {
   db.run(sql, cb);
 };
 
-let clear = () => {
+const clear = () => {
   db.run('DROP TABLE IF EXISTS `playlist`');
 };
-
 
 export default {
   create: create,
@@ -30,7 +31,17 @@ export default {
     });
   },
 
-  open: () => {
-    return db;
+  open: (cb) => {
+    if (db) {
+      cb(db);
+    } else {
+      db = new sqlite3.Database(`${userHome}/rotesonne.db`,
+        sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+        () => {
+          create(() => {
+            cb(db);
+          });
+        });
+    }
   }
 };

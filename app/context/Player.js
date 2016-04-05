@@ -7,6 +7,7 @@ require('av/src/devices/webaudio');
 require('flac.js');
 require('aac/build/aac');
 require('alac/build/alac');
+require('mp3/build/mp3');
 
 class Player {
   constructor() {

@@ -21,8 +21,8 @@
     "url": "https://github.com/industral/RoteSonne.js/issues"
   },
   "build": {
-    "app-bundle-id": "your.id",
-    "app-category-type": "your.app.category.type",
+    "app-bundle-id": "org.rotesonne",
+    "app-category-type": "public.app-category.music",
     "osx": {
       "icon": "build/icon.icns",
       "icon-size": 80,
@@ -37,8 +37,7 @@
         {
           "x": 130,
           "y": 220,
-          "type": "file",
-          "path": "computed path to artifact, do not specify it - will be overwritten"
+          "type": "file"
         }
       ]
     }
@@ -59,7 +58,7 @@
     "url-loader": "^0.5.7",
     "webpack": "^1.12.14",
     "electron-prebuilt": "",
-    "electron-builder": ""
+    "electron-builder": "next"
   },
   "scripts": {
     "postinstall": "./node_modules/.bin/install-app-deps",

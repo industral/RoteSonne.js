@@ -19,21 +19,23 @@ class AlbumList extends React.Component {
    * @returns {Promise}
    */
   getAlbumList(props) {
-    let selectedArtist = props.store.selected.artist;
-    let db = database.open();
-
     return new Promise((resolve, reject) => {
-      db.all("SELECT album, COUNT(title) as tracks FROM playlist WHERE albumArtist = ? GROUP BY album",
-        [selectedArtist], function(error, results) {
-          if (results) {
-            console.debug(results);
-            resolve(results);
-          } else {
-            console.error(error);
 
-            reject(error);
-          }
-        });
+      let selectedArtist = props.store.selected.artist;
+      database.open((db) => {
+        db.all("SELECT album, COUNT(title) as tracks FROM playlist WHERE albumArtist = ? GROUP BY album",
+          [selectedArtist], function(error, results) {
+            if (results) {
+              console.debug(results);
+              resolve(results);
+            } else {
+              console.error(error);
+
+              reject(error);
+            }
+          });
+      });
+
     });
   }
 
@@ -61,7 +63,6 @@ class AlbumList extends React.Component {
           return (
             <li className={classList} key={index} onClick={this.setSelectedAlbum.bind(this, value.album)}
                 title={value.album}>
-              <img className="img-circle media-object pull-left" src="/assets/img/avatar.jpg" width="32" height="32" />
               <div className="media-body">
                 <strong>{value.album}</strong>
                 <p>{value.tracks} songs</p>

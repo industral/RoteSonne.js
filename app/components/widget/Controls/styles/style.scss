@@ -1,29 +1,4 @@
 .cmp-widget-controls {
   .controls {
-
-    button {
-      background-color: #eee;
-      background-position: center;
-      background-repeat: no-repeat;
-      border: 1px solid #ccc;
-      height: 50px;
-      margin: 0 5px 0 0;
-      width: 50px;
-    }
-
-    @each $control in backward forward stop {
-      button[data-id=#{$control}] {
-        background-image: url('../images/#{$control}.png');
-      }
-    }
-
-    button[data-is-playing='true'] {
-      background-image: url('../images/pause.png');
-    }
-
-    button[data-is-playing='false'] {
-      background-image: url('../images/start.png');
-    }
-
   }
 }

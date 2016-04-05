@@ -1,11 +1,10 @@
-//import './styles/style.scss'
+import './styles/style.scss'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {connect} from 'react-redux'
 
-import wrench from 'wrench'
+import fse from 'fs-extra'
 import async from 'async'
-
 import AV from 'av'
 
 import database from '../../../context/db'
@@ -15,61 +14,62 @@ class LibraryProcess extends React.Component {
     super();
 
     this.state = {};
-    this.extensions = /\.aac|\.flac|\.m4a/;
+    this.extensions = /\.aac|\.flac|\.m4a|\.mp3/;
   }
 
   componentDidMount() {
-    if (this.props.path) {
-      this.processPath(this.props.path[0]);
+    if (this.props.files) {
+      this.processPath(this.props.files[0]);
     }
   }
 
   render() {
     return (
       <div className="cmp-widget cmp-widget-library-process">
-        LibraryProcess {String(this.state.done)}
+        <div>Processing library...</div>
+        <img src="./components/widget/LibraryProcess/images/ajax-loader.gif" />
       </div>
     )
   }
 
-  processPath(libraryPath) {
-    this.getFilesInLibrary(libraryPath).then((files) => {
-      this.getMetadataFromFiles(libraryPath, files).then(this.writeToDB.bind(this));
+  processPath(libraryFiles) {
+    this.getFilesInLibrary(libraryFiles).then((files) => {
+      this.getMetadataFromFiles(files).then(this.writeToDB.bind(this));
     });
   }
 
   /**
    * Scan library and return array of found files.
-   * @param {String} path path to library
+   * @param {String} files path to library
    * @returns {Promise}
    */
-  getFilesInLibrary(path) {
-    let output = [];
-
+  getFilesInLibrary(files) {
     return new Promise((resolve) => {
-      wrench.readdirRecursive(path, (error, curFiles) => {
-        if (error) {
-          console.error(error);
-        } else if (curFiles) {
-          output = output.concat(curFiles);
-        } else {
-          output = output.filter((value) => {
-            return value.match(this.extensions)
-          });
+      var items = [];
 
-          resolve(output);
-        }
-      });
+      fse.walk(files)
+        .on('data', (item) => {
+          console.log(item);
+          if (!item.stats.isDirectory() && item.path.match(this.extensions)) {
+            items.push(item.path);
+          }
+        })
+        .on('error', (error) => {
+          console.error(error);
+        })
+        .on('end', () => {
+          resolve(items);
+        });
     });
   }
 
-  getMetadataFromFiles(libraryPath, files) {
+  getMetadataFromFiles(files) {
     let output = [];
 
     return new Promise((resolve, reject) => {
       async.eachSeries(files, (file, callback) => {
-        var asset = AV.Asset.fromFile(`${libraryPath}/${file}`);
-        console.log(`${libraryPath}/${file}`);
+        var asset = AV.Asset.fromFile(file);
+        console.log(file);
 
         asset.on('error', (e) => {
           console.error(e);
@@ -81,7 +81,7 @@ class LibraryProcess extends React.Component {
           console.log(metadata);
 
           output.push({
-            file: `${libraryPath}/${file}`,
+            file: file,
             artist: metadata.artist || 'Unknow',
             albumArtist: metadata.albumArtist || metadata.artist || 'Unknow',
             album: metadata.album || 'Unknow',
@@ -103,17 +103,31 @@ class LibraryProcess extends React.Component {
   }
 
   writeToDB(library) {
-    let db = database.open();
-    database.recreate(() => {
-      library.forEach((value, index) => {
-        db.run("INSERT INTO playlist VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-          [index, value.artist, value.albumArtist, value.album, value.title, value.file, value.diskNumber,
-            value.trackNumber]);
+    database.open((db) => {
+      database.recreate(() => {
+
+        if (library.length) {
+          library.forEach((value, index) => {
+            db.run("INSERT INTO playlist VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+              [index, value.artist, value.albumArtist, value.album, value.title, value.file, value.diskNumber,
+                value.trackNumber], () => {
+                if (index === library.length - 1) {
+                  this.done();
+                }
+              });
+          });
+        } else {
+          this.done();
+        }
       });
     });
   }
 
   done() {
+    this.props.dispatch({
+      type: 'LIBRARY_UPDATED'
+    });
+
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this).parentNode);
   }
 }
