@@ -1,6 +1,6 @@
 {
   "name": "rotesonne.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Audio Player",
   "main": "index.js",
   "repository": {
@@ -30,13 +30,13 @@
       "ignore": "bundle.js.map",
       "contents": [
         {
-          "x": 410,
+          "x": 510,
           "y": 220,
           "type": "link",
           "path": "/Applications"
         },
         {
-          "x": 130,
+          "x": 100,
           "y": 220,
           "type": "file"
         }
@@ -58,8 +58,8 @@
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.12.14",
-    "electron-prebuilt": "",
-    "electron-builder": "next"
+    "electron-prebuilt": "^0.37.4",
+    "electron-builder": ""
   },
   "scripts": {
     "postinstall": "./node_modules/.bin/install-app-deps",

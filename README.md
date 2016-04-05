@@ -38,5 +38,6 @@ $ electron app/
 ## Create a build
 
 ```bash
-$ npm run pack
+$ npm run pack # create .app
+$ npm run dist # create .dmg
 ```

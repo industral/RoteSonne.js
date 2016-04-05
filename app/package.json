@@ -2,7 +2,7 @@
   "private": true,
   "name": "rotesonne.js",
   "description": "Audio Player",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Alex Ivasyuv",
   "productName": "RoteSonne@js",
   "dependencies": {
