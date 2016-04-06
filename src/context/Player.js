@@ -52,8 +52,8 @@ class Player {
 
   stop() {
     if (this.player) {
-      this.player.pause();
       this.player.stop();
+      this.player.asset.source.stream.close();
       this.player.isStop = true;
     }
   }

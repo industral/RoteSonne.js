@@ -31,7 +31,7 @@ $ npm i && make browser
 $ cd ../../..
 
 $ webpack -w
-$ electron app/
+$ DEBUG=1 electron app/
 ```
 
 

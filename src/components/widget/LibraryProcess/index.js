@@ -35,6 +35,8 @@ class LibraryProcess extends React.Component {
   processPath(libraryFiles) {
     this.getFilesInLibrary(libraryFiles).then((files) => {
       this.getMetadataFromFiles(files).then(this.writeToDB.bind(this));
+    }).catch((error) => {
+      console.error(error);
     });
   }
 
@@ -68,16 +70,21 @@ class LibraryProcess extends React.Component {
 
     return new Promise((resolve, reject) => {
       async.eachSeries(files, (file, callback) => {
-        var asset = AV.Asset.fromFile(file);
-        console.log(file);
+        let asset = AV.Asset.fromFile(file);
 
-        asset.on('error', (e) => {
+        let onError = (e) => {
           console.error(e);
 
-          asset.source.stream.close();
+          this.releaseResource(asset, {
+            onError,
+            onMetadata,
+            onData
+          });
+
           callback();
-        });
-        asset.get('metadata', (metadata) => {
+        };
+
+        let onMetadata = (metadata) => {
           console.log(metadata);
 
           output.push({
@@ -90,17 +97,51 @@ class LibraryProcess extends React.Component {
             trackNumber: metadata.trackNumber
           });
 
-          asset.source.stream.close();
+          this.releaseResource(asset, {
+            onError,
+            onMetadata,
+            onData
+          });
+
           callback();
-        });
+        };
+
+        /**
+         * Some decoders, doesn't fire any events if they don't find metadata.
+         * To avoid hung, we check if program go to data section. If so, we don't
+         * have metadata.
+         * Give a time to ensure we don't have metadata.
+         */
+        let onData = () => {
+          setTimeout(() => {
+            asset.emit('error', `Can't read metadata from file ${file}`);
+          }, 300);
+        };
+
+        console.log(file, asset);
+
+        asset.on('error', onError);
+        asset.get('metadata', onMetadata);
+        asset.once('data', onData);
       }, (err) => {
         if (err) {
+          console.error(e);
+
           reject(err);
         }
 
+        console.log(output);
         resolve(output);
       });
     });
+  }
+
+  releaseResource(asset, callbacks) {
+    asset.source.stream.close();
+    asset.off('data', callbacks.onData);
+    asset.off('error', callbacks.onError);
+    asset.off('metadata', callbacks.onMetadata);
+    asset = null;
   }
 
   writeToDB(library) {
