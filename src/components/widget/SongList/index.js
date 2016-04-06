@@ -1,11 +1,10 @@
-import './styles/style.css'
-
 import React from 'react'
 import {connect} from 'react-redux'
-import Player from '../../../context/Player'
-import TrackItem from './trackItem'
 
 import database from '../../../context/db'
+
+import SongListComponent from './songListComponent'
+
 
 class SongList extends React.Component {
   constructor() {
@@ -14,44 +13,13 @@ class SongList extends React.Component {
     this.state = {
       tracks: []
     };
-
-    this.player = Player.getInstance();
-  }
-
-  setSelectTrack(title, file) {
-    this.props.dispatch({
-      type: 'SET_SELECTED_TRACK',
-      value: {
-        title: title,
-        file: file
-      }
-    });
-  }
-
-  playTrack(title, file) {
-    this.player.stop();
-
-    setTimeout(() => {
-      this.player.play(file);
-
-      this.props.dispatch({
-        type: 'PLAY',
-        value: {
-          title: title,
-          file: file
-        }
-      });
-    }, 500);
-
   }
 
   getPlayList(props) {
     return new Promise((resolve, reject) => {
-
-      let selected = props.store.selected;
       database.open((db) => {
-        db.all("SELECT * FROM playlist WHERE albumArtist = ? and album = ?",
-          [selected.artist, selected.album], function(error, results) {
+        db.all('SELECT * FROM playlist WHERE albumArtist = ? and album = ?',
+          [props.selected.artist, props.selected.album], (error, results) => {
             if (results) {
               console.debug(results);
               resolve(results);
@@ -67,59 +35,30 @@ class SongList extends React.Component {
   }
 
   render() {
-    var tracks = this.state.tracks.map((value, index) => {
-      let classList = () => {
-        var output = [];
-
-        if (this.props.store.selected.file === value.file) {
-          output.push('selected');
-        }
-
-        if (this.props.store.playing.file === value.file) {
-          output.push('active');
-        }
-
-        return output.join(' ');
-      };
-
-      return (<TrackItem
-        classList={classList()}
-        key={index}
-        {...value}
-        onClick={this.setSelectTrack.bind(this, value.title, value.file)}
-        onDoubleClick={this.playTrack.bind(this, value.title, value.file)}
-      />)
-    });
-
-    return (
-      <div className="cmp-widget cmp-widget-song-list table-striped">
-        <table>
-          <thead>
-            <tr>
-              <th className="track">Track</th>
-              <th>Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tracks}
-          </tbody>
-        </table>
-      </div>
-    )
+    return (<SongListComponent
+      trackList={this.state.tracks}
+      selectedFile={this.props.selected.file}
+      playingFile={this.props.playing.file}
+    />)
   }
 
   componentWillReceiveProps(nextProps) {
-    this.getPlayList(nextProps).then((data) => {
-      this.setState({
-        tracks: data
+    if (this.props.selected.artist !== nextProps.selected.artist ||
+        this.props.selected.album !== nextProps.selected.album) {
+      this.getPlayList(nextProps).then((data) => {
+        this.setState({
+          tracks: data
+        });
       });
-    });
+    }
   }
+
 }
 
 const mapStatesToProps = (store) => {
   return {
-    store: store
+    selected: store.selected,
+    playing: store.playing
   }
 };
 

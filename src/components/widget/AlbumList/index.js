@@ -23,7 +23,7 @@ class AlbumList extends React.Component {
 
       let selectedArtist = props.store.selected.artist;
       database.open((db) => {
-        db.all("SELECT album, COUNT(title) as tracks FROM playlist WHERE albumArtist = ? GROUP BY album",
+        db.all('SELECT album, COUNT(title) as tracks FROM playlist WHERE albumArtist = ? GROUP BY album',
           [selectedArtist], function(error, results) {
             if (results) {
               console.debug(results);
@@ -47,31 +47,40 @@ class AlbumList extends React.Component {
   }
 
   render() {
+    let albumList = this.state.albums.map((value, index) => {
+      let classList = 'list-group-item ' + (this.props.store.selected.album === value.album ? 'active' : '');
+
+      return (
+        <li className={classList} key={index} onClick={this.setSelectedAlbum.bind(this, value.album)}
+            title={value.album}>
+          <div className="media-body">
+            <strong>{value.album}</strong>
+            <p>{value.tracks} songs</p>
+          </div>
+        </li>
+      );
+    });
+
     return (
       <ul className="cmp-widget cmp-widget-album-list list-group">
-        {this.state.albums}
+        {albumList}
       </ul>
     )
   }
 
   componentWillReceiveProps(nextProps) {
-    this.getAlbumList(nextProps).then((data) => {
-      this.setState({
-        albums: data.map((value, index) => {
-          let classList = 'list-group-item ' + (this.props.store.selected.album === value.album ? 'active' : '');
-
-          return (
-            <li className={classList} key={index} onClick={this.setSelectedAlbum.bind(this, value.album)}
-                title={value.album}>
-              <div className="media-body">
-                <strong>{value.album}</strong>
-                <p>{value.tracks} songs</p>
-              </div>
-            </li>
-          );
-        })
+    if (this.props.store.selected.artist !== nextProps.store.selected.artist) {
+      this.getAlbumList(nextProps).then((data) => {
+        this.setState({
+          albums: data
+        });
       });
-    });
+    }
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return this.props.store.selected.artist ||
+           (this.props.store.selected.artist !== nextProps.store.selected.artist);
   }
 }
 

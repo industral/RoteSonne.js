@@ -22,7 +22,7 @@ class ArtistList extends React.Component {
     return new Promise((resolve, reject) => {
 
       database.open((db) => {
-        db.all("SELECT albumArtist as artist, COUNT(DISTINCT album) as albums FROM playlist GROUP BY albumArtist",
+        db.all('SELECT albumArtist as artist, COUNT(DISTINCT album) as albums FROM playlist GROUP BY albumArtist',
           function(error, results) {
             if (results) {
               console.debug(results);
@@ -46,39 +46,48 @@ class ArtistList extends React.Component {
   }
 
   render() {
+    let artistsList = this.state.artists.map((value, index) => {
+      let classList = 'list-group-item ' + (this.props.store.selected.artist === value.artist ? 'active' : '');
+
+      return (
+        <li className={classList} key={index} onClick={this.setSelectedArtist.bind(this, value.artist)}
+            title={value.artist}>
+          <div className="media-body">
+            <strong>{value.artist}</strong>
+            <p>{value.albums} albums</p>
+          </div>
+        </li>
+      );
+    });
+
     return (
       <ul className="cmp-widget cmp-widget-artist-list list-group">
-        {this.state.artists}
+        {artistsList}
       </ul>
     )
   }
 
-  createList() {
+  getListOfArtists() {
     this.getPlayList().then((data) => {
       this.setState({
-        artists: data.map((value, index) => {
-          let classList = 'list-group-item ' + (this.props.store.selected.artist === value.artist ? 'active' : '');
-
-          return (
-            <li className={classList} key={index} onClick={this.setSelectedArtist.bind(this, value.artist)}
-                title={value.artist}>
-              <div className="media-body">
-                <strong>{value.artist}</strong>
-                <p>{value.albums} albums</p>
-              </div>
-            </li>
-          );
-        })
+        artists: data
       });
     });
   }
 
   componentDidMount() {
-    this.createList();
+    this.getListOfArtists();
   }
 
-  componentWillReceiveProps() {
-    this.createList();
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.store.libraryUpdated) {
+      this.getListOfArtists();
+    }
+  }
+
+  shouldComponentUpdate(nextProps) {
+    return (!this.props.store.selected.artist ||
+            (this.props.store.selected.artist !== nextProps.store.selected.artist));
   }
 }
 

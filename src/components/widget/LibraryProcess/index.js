@@ -150,7 +150,7 @@ class LibraryProcess extends React.Component {
 
         if (library.length) {
           library.forEach((value, index) => {
-            db.run("INSERT INTO playlist VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            db.run('INSERT INTO playlist VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
               [index, value.artist, value.albumArtist, value.album, value.title, value.file, value.diskNumber,
                 value.trackNumber], () => {
                 if (index === library.length - 1) {
