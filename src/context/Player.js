@@ -18,6 +18,9 @@ class Player {
     };
 
     this.store = window._store;
+
+    this.duration = 0;
+    this.progress = 0;
   }
 
   static getInstance() {
@@ -41,6 +44,10 @@ class Player {
 
         this.player = AV.Player.fromFile(track);
       }
+
+      this.player.once('duration', (duration) => {
+        this.duration = duration;
+      });
 
       this.player.play();
     }
@@ -66,6 +73,18 @@ class Player {
     } else {
       this.play();
     }
+  }
+
+  getProgress() {
+    if (this.duration) {
+      return 100 / (this.duration / this.player.currentTime);
+    }
+
+    return 0;
+  }
+
+  setProgress(val) {
+    this.player.seek(this.duration * val / 100);
   }
 }
 

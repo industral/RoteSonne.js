@@ -1,6 +1,8 @@
 import './styles/style.scss'
+
 import React from 'react'
 import {connect} from 'react-redux'
+
 import Player from '../../../context/Player'
 
 class Controls extends React.Component {
@@ -16,6 +18,27 @@ class Controls extends React.Component {
     this.props.dispatch({
       type: 'TOGGLE_PLAY'
     });
+  }
+
+  handleSeeking() {
+    const progress = this.refs.progress;
+    let moving = false;
+
+    setInterval(() => {
+      if (!moving) {
+        progress.value = this.player.getProgress();
+      }
+    }, 1000);
+
+    progress.onmousedown = () => {
+      moving = true;
+    };
+
+    progress.onmouseup = () => {
+      moving = false;
+
+      this.player.setProgress(progress.value);
+    };
   }
 
   render() {
@@ -43,8 +66,15 @@ class Controls extends React.Component {
             </button>
           </div>
         </div>
+
+        <input type="range" min="0" max="100" ref="progress" className="seek" defaultValue="0" step="0.1" />
+
       </div>
     )
+  }
+
+  componentDidMount() {
+    this.handleSeeking();
   }
 }
 

@@ -1,4 +1,13 @@
 .cmp-widget-controls {
-  .controls {
+  .toolbar-actions,
+  .seek {
+    display: inline-block;
+  }
+
+  .seek {
+    left: 20px;
+    position: relative;
+    top: 4px;
+    width: 400px;
   }
 }

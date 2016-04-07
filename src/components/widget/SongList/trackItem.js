@@ -1,18 +1,26 @@
 import React from 'react'
 
-class TrackItem extends React.Component {
-  constructor() {
-    super();
-  }
+const TrackItem = (props) => {
+  let classList = () => {
+    var output = [];
 
-  render() {
-    return (
-      <tr onClick={this.props.onClick} onDoubleClick={this.props.onDoubleClick} className={this.props.classList}>
-        <td>{this.props.trackNumber}</td>
-        <td>{this.props.title}</td>
-      </tr>
-    )
-  }
-}
+    if (props.selectedFile === props.trackInfo.file) {
+      output.push('selected');
+    }
+
+    if (props.playingFile === props.trackInfo.file) {
+      output.push('active');
+    }
+
+    return output.join(' ');
+  };
+
+  return (
+    <tr onClick={props.onClick} onDoubleClick={props.onDoubleClick} className={classList()}>
+      <td>{props.trackInfo.trackNumber}</td>
+      <td>{props.trackInfo.title}</td>
+    </tr>
+  );
+};
 
 export default TrackItem;

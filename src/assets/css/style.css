@@ -7,3 +7,8 @@
 .table-striped tr.selected {
   font-weight: bold;
 }
+
+.title {
+  font-size: 14px;
+  font-weight: bold;
+}
