@@ -3,6 +3,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 
 import database from '../../../context/db'
+import utils from '../../../assets/js/Utils'
 
 class AlbumList extends React.Component {
   constructor() {
@@ -11,6 +12,9 @@ class AlbumList extends React.Component {
     this.state = {
       albums: []
     };
+
+    // cache
+    this.albumsCovers = {};
   }
 
   /**
@@ -19,21 +23,33 @@ class AlbumList extends React.Component {
    * @returns {Promise}
    */
   getAlbumList(props) {
+    const sql = `SELECT
+                  playlist.album,
+                  COUNT(playlist.title) AS tracks,
+                  (SELECT albums.coverArt FROM albums 
+                    WHERE albums.albumArtist = $artist AND albums.album = playlist.album) as coverArt,
+                  (SELECT albums.id FROM albums 
+                    WHERE albums.albumArtist = $artist AND albums.album = playlist.album) as id
+                
+                FROM playlist
+
+                WHERE playlist.albumArtist = $artist 
+                GROUP BY playlist.album`;
+
     return new Promise((resolve, reject) => {
+      const selectedArtist = props.store.selected.artist;
 
-      let selectedArtist = props.store.selected.artist;
       database.open((db) => {
-        db.all('SELECT album, COUNT(title) as tracks FROM playlist WHERE albumArtist = ? GROUP BY album',
-          [selectedArtist], function(error, results) {
-            if (results) {
-              console.debug(results);
-              resolve(results);
-            } else {
-              console.error(error);
+        db.all(sql, {$artist: selectedArtist}, function(error, results) {
+          if (results) {
+            console.debug(results);
+            resolve(results);
+          } else {
+            console.error(error);
 
-              reject(error);
-            }
-          });
+            reject(error);
+          }
+        });
       });
 
     });
@@ -48,11 +64,13 @@ class AlbumList extends React.Component {
 
   render() {
     let albumList = this.state.albums.map((value, index) => {
-      let classList = 'list-group-item ' + (this.props.store.selected.album === value.album ? 'active' : '');
+      const classList = 'list-group-item ' + (this.props.store.selected.album === value.album ? 'active' : '');
+      const coverArt = this.getCoverAsURL(value.id, value.coverArt);
 
       return (
         <li className={classList} key={index} onClick={this.setSelectedAlbum.bind(this, value.album)}
             title={value.album}>
+          <img className="media-object pull-left" src={coverArt} width="50" height="50" />
           <div className="media-body">
             <strong>{value.album}</strong>
             <p>{value.tracks} songs</p>
@@ -66,6 +84,10 @@ class AlbumList extends React.Component {
         {albumList}
       </ul>
     )
+  }
+
+  getCoverAsURL(id, coverData) {
+    return this.albumsCovers[id] || (this.albumsCovers[id] = utils.getURLfromBlob(coverData));
   }
 
   componentWillReceiveProps(nextProps) {

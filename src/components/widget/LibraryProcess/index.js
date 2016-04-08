@@ -7,6 +7,8 @@ import fse from 'fs-extra'
 import async from 'async'
 import AV from 'av'
 
+import utils from '../../../assets/js/Utils'
+
 import database from '../../../context/db'
 
 class LibraryProcess extends React.Component {
@@ -15,6 +17,9 @@ class LibraryProcess extends React.Component {
 
     this.state = {};
     this.extensions = /\.aac|\.flac|\.m4a|\.mp3/;
+    this.db = null;
+
+    this.writeToDB = this.writeToDB.bind(this);
   }
 
   componentDidMount() {
@@ -34,9 +39,24 @@ class LibraryProcess extends React.Component {
 
   processPath(libraryFiles) {
     this.getFilesInLibrary(libraryFiles).then((files) => {
-      this.getMetadataFromFiles(files).then(this.writeToDB.bind(this));
+
+      if (files && files.length) {
+        database.open((db) => {
+          database.recreate(() => {
+            this.db = db;
+
+            this.getMetadataFromFiles(files, this.writeToDB).then(() => {
+              this.done();
+            })
+          });
+        });
+      } else {
+        this.done();
+      }
     }).catch((error) => {
       console.error(error);
+
+      this.done();
     });
   }
 
@@ -65,9 +85,7 @@ class LibraryProcess extends React.Component {
     });
   }
 
-  getMetadataFromFiles(files) {
-    let output = [];
-
+  getMetadataFromFiles(files, trackInfoCallback) {
     return new Promise((resolve, reject) => {
       async.eachSeries(files, (file, callback) => {
         let asset = AV.Asset.fromFile(file);
@@ -87,14 +105,17 @@ class LibraryProcess extends React.Component {
         let onMetadata = (metadata) => {
           console.log(metadata);
 
-          output.push({
+          const covertArt = metadata.coverArt ? metadata.coverArt.data : undefined;
+
+          trackInfoCallback({
             file: file,
-            artist: metadata.artist || 'Unknow',
-            albumArtist: metadata.albumArtist || metadata.artist || 'Unknow',
-            album: metadata.album || 'Unknow',
-            title: metadata.title || file.split('/').pop().replace(this.extensions, ''),
+            artist: utils.removeNonASCII(metadata.artist || 'Unknow'),
+            albumArtist: utils.removeNonASCII(metadata.albumArtist || metadata.artist || 'Unknow'),
+            album: utils.removeNonASCII(metadata.album || 'Unknow'),
+            title: utils.removeNonASCII(metadata.title || file.split('/').pop().replace(this.extensions, '')),
             diskNumber: metadata.diskNumber,
-            trackNumber: metadata.trackNumber
+            trackNumber: metadata.trackNumber,
+            coverArt: covertArt
           });
 
           this.releaseResource(asset, {
@@ -130,8 +151,7 @@ class LibraryProcess extends React.Component {
           reject(err);
         }
 
-        console.log(output);
-        resolve(output);
+        resolve();
       });
     });
   }
@@ -144,25 +164,23 @@ class LibraryProcess extends React.Component {
     asset = null;
   }
 
-  writeToDB(library) {
-    database.open((db) => {
-      database.recreate(() => {
+  writeToDB(fileInfo) {
+    this.db.run('INSERT INTO `playlist` VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [null, fileInfo.artist, fileInfo.albumArtist, fileInfo.album, fileInfo.title, fileInfo.file, fileInfo.diskNumber,
+        fileInfo.trackNumber], (error) => {
 
-        if (library.length) {
-          library.forEach((value, index) => {
-            db.run('INSERT INTO playlist VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-              [index, value.artist, value.albumArtist, value.album, value.title, value.file, value.diskNumber,
-                value.trackNumber], () => {
-                if (index === library.length - 1) {
-                  this.done();
-                }
-              });
-          });
-        } else {
-          this.done();
+        if (error) {
+          console.error(error);
         }
+
+        this.db.run('INSERT OR IGNORE INTO `albums` VALUES  (?, ?, ?, ?)',
+          [null, fileInfo.albumArtist, fileInfo.album, fileInfo.coverArt], (error) => {
+            if (error) {
+              console.error(error);
+            }
+          });
+
       });
-    });
   }
 
   done() {

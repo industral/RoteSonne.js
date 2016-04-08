@@ -13,7 +13,7 @@ Rewritten version of [RoteSonne](https://github.com/industral/RoteSonne)
 $ npm i electron-prebuilt -g
 $ npm i
 
-$ cd app/node_modules/av
+$ cd app/node_modules/av # temporary
 $ npm i && make browser
 
 $ cd ../aac

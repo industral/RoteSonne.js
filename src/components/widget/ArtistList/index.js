@@ -1,6 +1,9 @@
-//import './styles/style.scss'
+import './styles/style.scss'
+
 import React from 'react'
 import {connect} from 'react-redux'
+
+import AlbumCover from './AlbumCover'
 
 import database from '../../../context/db'
 
@@ -19,20 +22,29 @@ class ArtistList extends React.Component {
    * @returns {Promise}
    */
   getPlayList() {
+    const sql = `SELECT albumArtist as artist, id,
+      COUNT(DISTINCT album) as albums,
+      (SELECT coverArt from albums where albums.albumArtist = playlist.albumArtist AND coverArt NOT NULL LIMIT 0,1) as coverArt1,
+      (SELECT coverArt from albums where albums.albumArtist = playlist.albumArtist AND coverArt NOT NULL LIMIT 1,1) as coverArt2,
+      (SELECT coverArt from albums where albums.albumArtist = playlist.albumArtist AND coverArt NOT NULL LIMIT 2,1) as coverArt3,
+      (SELECT coverArt from albums where albums.albumArtist = playlist.albumArtist AND coverArt NOT NULL LIMIT 3,1) as coverArt4
+
+      FROM playlist 
+      GROUP BY albumArtist`;
+
     return new Promise((resolve, reject) => {
 
       database.open((db) => {
-        db.all('SELECT albumArtist as artist, COUNT(DISTINCT album) as albums FROM playlist GROUP BY albumArtist',
-          function(error, results) {
-            if (results) {
-              console.debug(results);
-              resolve(results);
-            } else {
-              console.error(error);
+        db.all(sql, (error, results) => {
+          if (results) {
+            console.debug(results);
+            resolve(results);
+          } else {
+            console.error(error);
 
-              reject(error);
-            }
-          });
+            reject(error);
+          }
+        });
       });
 
     });
@@ -52,6 +64,7 @@ class ArtistList extends React.Component {
       return (
         <li className={classList} key={index} onClick={this.setSelectedArtist.bind(this, value.artist)}
             title={value.artist}>
+          <AlbumCover {...value} />
           <div className="media-body">
             <strong>{value.artist}</strong>
             <p>{value.albums} albums</p>
