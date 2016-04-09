@@ -4,23 +4,23 @@ let db = null;
 
 const create = (cb = () => {
 }) => {
-  const sqlPlaylist = 'CREATE TABLE IF NOT EXISTS `playlist` (' +
-                      '`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,' +
-                      '`artist` TEXT NOT NULL PRIMARY KEY,' +
-                      '`albumArtist` TEXT NOT NULL PRIMARY KEY,' +
-                      '`album` TEXT NOT NULL PRIMARY KEY,' +
-                      '`title` TEXT NOT NULL,' +
-                      '`file` TEXT NOT NULL UNIQUE,' +
-                      '`diskNumber` TEXT,' +
-                      '`trackNumber` TEXT' +
-                      ')';
+  const sqlPlaylist = `CREATE TABLE IF NOT EXISTS playlist (
+                        id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+                        artist TEXT NOT NULL,
+                        albumArtist TEXT NOT NULL,
+                        album TEXT NOT NULL,
+                        title TEXT NOT NULL,
+                        file TEXT NOT NULL UNIQUE,
+                        diskNumber TEXT,
+                        trackNumber TEXT
+                       )`;
 
-  const sqlAlbums = 'CREATE TABLE `albums` (' +
-                    '`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, ' +
-                    '`albumArtist` TEXT NOT NULL PRIMARY KEY,' +
-                    '`album` TEXT NOT NULL PRIMARY KEY UNIQUE,' +
-                    '`coverArt` BLOB' +
-                    ')';
+  const sqlAlbums = `CREATE TABLE IF NOT EXISTS albums (
+                      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,
+                      albumArtist TEXT NOT NULL,
+                      album TEXT NOT NULL UNIQUE,
+                      coverArt BLOB
+                     )`;
 
   db.serialize(() => {
     db.run(sqlPlaylist);
