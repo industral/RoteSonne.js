@@ -9,9 +9,9 @@ class AlbumList extends React.Component {
   constructor() {
     super();
 
-    this.state = {
-      albums: []
-    };
+    // this.state = {
+    //   albums: []
+    // };
 
     // cache
     this.albumsCovers = {};
@@ -37,7 +37,7 @@ class AlbumList extends React.Component {
                 GROUP BY playlist.album`;
 
     return new Promise((resolve, reject) => {
-      const selectedArtist = props.store.selected.artist;
+      const selectedArtist = props.store.getIn(['selected', 'artist']);
 
       database.open((db) => {
         db.all(sql, {$artist: selectedArtist}, function(error, results) {
@@ -63,17 +63,17 @@ class AlbumList extends React.Component {
   }
 
   render() {
-    let albumList = this.state.albums.map((value, index) => {
-      const classList = 'list-group-item ' + (this.props.store.selected.album === value.album ? 'active' : '');
-      const coverArt = this.getCoverAsURL(value.id, value.coverArt);
+    let albumList = this.props.store.getIn(['library', 'albums']).map((value, index) => {
+      const classList = 'list-group-item ' + (this.props.store.getIn(['selected', 'album']) === value.get('album') ? 'active' : '');
+      const coverArt = this.getCoverAsURL(value.get('id'), value.get('coverArt'));
 
       return (
-        <li className={classList} key={index} onClick={this.setSelectedAlbum.bind(this, value.album)}
-            title={value.album}>
+        <li className={classList} key={index} onClick={this.setSelectedAlbum.bind(this, value.get('album'))}
+            title={value.get('album')}>
           <img className="media-object pull-left" src={coverArt} width="50" height="50" />
           <div className="media-body">
-            <strong>{value.album}</strong>
-            <p>{value.tracks} songs</p>
+            <strong>{value.get('album')}</strong>
+            <p>{value.get('tracks')} songs</p>
           </div>
         </li>
       );
@@ -87,23 +87,33 @@ class AlbumList extends React.Component {
   }
 
   getCoverAsURL(id, coverData) {
-    return this.albumsCovers[id] || (this.albumsCovers[id] = utils.getURLfromBlob(coverData));
+    // this.albumsCovers[id] || (this.albumsCovers[id] =
+    return utils.getURLfromBlob(coverData);
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.store.selected.artist !== nextProps.store.selected.artist) {
+    if (this.props.store.getIn(['selected', 'artist']) !== nextProps.store.getIn(['selected', 'artist'])) {
       this.getAlbumList(nextProps).then((data) => {
-        this.setState({
-          albums: data
+        // this.setState({
+        //   albums: data
+        // });
+
+console.log("SET_LIBRARY_ALBUMS");
+
+        this.props.dispatch({
+          type: 'SET_LIBRARY_ALBUMS',
+          value: data
         });
       });
     }
   }
 
-  shouldComponentUpdate(nextProps) {
-    return this.props.store.selected.artist ||
-           (this.props.store.selected.artist !== nextProps.store.selected.artist);
-  }
+  // shouldComponentUpdate(nextProps) {
+  // return !nextProps.getIn('library', 'artists').equals(this.props.getIn('library', 'artists'));
+  // return
+    // return this.props.store.selected.artist ||
+    //        (this.props.store.selected.artist !== nextProps.store.selected.artist);
+  // }
 }
 
 const mapStatesToProps = (store) => {

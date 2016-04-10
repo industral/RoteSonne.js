@@ -11,9 +11,9 @@ class ArtistList extends React.Component {
   constructor() {
     super();
 
-    this.state = {
-      artists: []
-    };
+    // this.state = {
+    //   artists: []
+    // };
   }
 
   /**
@@ -58,16 +58,18 @@ class ArtistList extends React.Component {
   }
 
   render() {
-    let artistsList = this.state.artists.map((value, index) => {
-      let classList = 'list-group-item ' + (this.props.store.selected.artist === value.artist ? 'active' : '');
+  console.info("123", this.props.store.getIn(['library', 'artists']));
+  
+    let artistsList = this.props.store.getIn(['library', 'artists']).map((value, index) => {
+      let classList = 'list-group-item ' + (this.props.store.getIn(['selected', 'artist']) === value.get('artist') ? 'active' : '');
 
       return (
-        <li className={classList} key={index} onClick={this.setSelectedArtist.bind(this, value.artist)}
-            title={value.artist}>
-          <AlbumCover {...value} />
+        <li className={classList} key={index} onClick={this.setSelectedArtist.bind(this, value.get('artist'))}
+            title={value.get('artist')}>
+          <AlbumCover data={value} />
           <div className="media-body">
-            <strong>{value.artist}</strong>
-            <p>{value.albums} albums</p>
+            <strong>{value.get('artist')}</strong>
+            <p>{value.get('albums')} albums</p>
           </div>
         </li>
       );
@@ -82,9 +84,22 @@ class ArtistList extends React.Component {
 
   getListOfArtists() {
     this.getPlayList().then((data) => {
-      this.setState({
-        artists: data
+      // this.setState({
+      //   artists: data
+      // });
+
+      console.log(data);
+
+      // this.props.dispatch({
+      //   type: 'LIBRARY_DID_UPDATE'
+      // });
+
+      this.props.dispatch({
+        type: 'SET_LIBRARY_ARTISTS',
+        value: data
       });
+      
+      
     });
   }
 
@@ -93,15 +108,16 @@ class ArtistList extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.store.libraryUpdated) {
+    if (nextProps.store.get('libraryUpdated')) {
       this.getListOfArtists();
     }
   }
 
-  shouldComponentUpdate(nextProps) {
-    return (!this.props.store.selected.artist ||
-            (this.props.store.selected.artist !== nextProps.store.selected.artist));
-  }
+  // shouldComponentUpdate(nextProps) {
+  //   return (!this.props.store.selected.artist ||
+  //          (this.props.store.selected.artist !== nextProps.store.selected.artist))
+  //          || nextProps.store.libraryUpdated;
+  // }
 }
 
 const mapStatesToProps = (store) => {

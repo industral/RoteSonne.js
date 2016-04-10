@@ -116,7 +116,7 @@ class LibraryProcess extends React.Component {
             diskNumber: metadata.diskNumber,
             trackNumber: metadata.trackNumber,
             coverArt: covertArt
-          });
+          }, callback);
 
           this.releaseResource(asset, {
             onError,
@@ -124,7 +124,7 @@ class LibraryProcess extends React.Component {
             onData
           });
 
-          callback();
+          // callback();
         };
 
         /**
@@ -164,7 +164,7 @@ class LibraryProcess extends React.Component {
     asset = null;
   }
 
-  writeToDB(fileInfo) {
+  writeToDB(fileInfo, callback) {
     this.db.run('INSERT INTO `playlist` VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [null, fileInfo.artist, fileInfo.albumArtist, fileInfo.album, fileInfo.title, fileInfo.file, fileInfo.diskNumber,
         fileInfo.trackNumber], (error) => {
@@ -178,8 +178,9 @@ class LibraryProcess extends React.Component {
             if (error) {
               console.error(error);
             }
-          });
 
+            callback();
+          });
       });
   }
 

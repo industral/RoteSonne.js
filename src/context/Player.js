@@ -1,4 +1,5 @@
 import AV from 'av';
+import Immutable from 'immutable'
 
 window.AV = AV;
 
@@ -36,7 +37,7 @@ class Player {
 
     if (!this.state.isPlaying) {
       if (!this.player || this.player.isStop) {
-        let track = file || store.playing.track || store.selected.track;
+        let track = file || store.getIn(['playing', 'track']) || store.getIn(['selected', 'track']);
 
         if (!track) {
           throw new Error('Select a file first!');

@@ -45,6 +45,7 @@ class SongListComponent extends React.Component {
   }
 
   render() {
+  console.log(444, this.props);
     return (
       <div className="cmp-widget cmp-widget-song-list table-striped">
         <table>
@@ -55,7 +56,7 @@ class SongListComponent extends React.Component {
             </tr>
           </thead>
           <TrackList
-            {...this.props}
+            data={this.props}
             setSelectTrack={this.setSelectTrack}
             playTrack={this.playTrack}
           />
