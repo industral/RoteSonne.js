@@ -4,11 +4,6 @@ import utils from '../../../assets/js/Utils'
 class AlbumCover extends React.Component {
   constructor() {
     super();
-
-    this.albumsCovers = {};
-    // this.state = {
-    //   covers: null
-    // };
   }
 
   render() {
@@ -27,16 +22,15 @@ class AlbumCover extends React.Component {
     return (
       <div>
         {covers.map((value, index) => {
-          const id = value ? `${this.props.data.get('id')}${index}` : 0;
-          const cover = this.getCoverAsURL(id, value);
+          const cover = utils.getURLfromBlob(value);
           return <img key={index} className="media-object pull-left" src={cover} />
         })}
       </div>
     )
   }
 
-  getCoverAsURL(id, coverData) {
-    return utils.getURLfromBlob(coverData);
+  shouldComponentUpdate(nextProps) {
+    return !nextProps.data.equals(this.props.data);
   }
 
 }

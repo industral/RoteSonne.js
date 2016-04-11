@@ -32,20 +32,18 @@ class SongListComponent extends React.Component {
 
     setTimeout(() => {
       this.player.play(file);
+    }, 300);
 
-      this.props.dispatch({
-        type: 'PLAY',
-        value: {
-          title: title,
-          file: file
-        }
-      });
-    }, 500);
-
+    this.props.dispatch({
+      type: 'PLAY',
+      value: {
+        title: title,
+        file: file
+      }
+    });
   }
 
   render() {
-  console.log(444, this.props);
     return (
       <div className="cmp-widget cmp-widget-song-list table-striped">
         <table>

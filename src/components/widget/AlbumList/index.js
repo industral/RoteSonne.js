@@ -1,6 +1,7 @@
 //import './styles/style.scss'
 import React from 'react'
 import {connect} from 'react-redux'
+import I from 'immutable'
 
 import database from '../../../context/db'
 import utils from '../../../assets/js/Utils'
@@ -8,13 +9,6 @@ import utils from '../../../assets/js/Utils'
 class AlbumList extends React.Component {
   constructor() {
     super();
-
-    // this.state = {
-    //   albums: []
-    // };
-
-    // cache
-    this.albumsCovers = {};
   }
 
   /**
@@ -22,7 +16,7 @@ class AlbumList extends React.Component {
    *
    * @returns {Promise}
    */
-  getAlbumList(props) {
+  getAlbumList(selectedArtist) {
     const sql = `SELECT
                   playlist.album,
                   COUNT(playlist.title) AS tracks,
@@ -37,12 +31,9 @@ class AlbumList extends React.Component {
                 GROUP BY playlist.album`;
 
     return new Promise((resolve, reject) => {
-      const selectedArtist = props.store.getIn(['selected', 'artist']);
-
       database.open((db) => {
         db.all(sql, {$artist: selectedArtist}, function(error, results) {
           if (results) {
-            console.debug(results);
             resolve(results);
           } else {
             console.error(error);
@@ -63,9 +54,9 @@ class AlbumList extends React.Component {
   }
 
   render() {
-    let albumList = this.props.store.getIn(['library', 'albums']).map((value, index) => {
-      const classList = 'list-group-item ' + (this.props.store.getIn(['selected', 'album']) === value.get('album') ? 'active' : '');
-      const coverArt = this.getCoverAsURL(value.get('id'), value.get('coverArt'));
+    let albumList = this.props.library.get('albums').map((value, index) => {
+      const classList = 'list-group-item ' + (this.props.selected.get('album') === value.get('album') ? 'active' : '');
+      const coverArt = utils.getURLfromBlob(value.get('coverArt'));
 
       return (
         <li className={classList} key={index} onClick={this.setSelectedAlbum.bind(this, value.get('album'))}
@@ -86,20 +77,11 @@ class AlbumList extends React.Component {
     )
   }
 
-  getCoverAsURL(id, coverData) {
-    // this.albumsCovers[id] || (this.albumsCovers[id] =
-    return utils.getURLfromBlob(coverData);
-  }
-
   componentWillReceiveProps(nextProps) {
-    if (this.props.store.getIn(['selected', 'artist']) !== nextProps.store.getIn(['selected', 'artist'])) {
-      this.getAlbumList(nextProps).then((data) => {
-        // this.setState({
-        //   albums: data
-        // });
+    const selectedArtist = nextProps.selected.get('artist');
 
-console.log("SET_LIBRARY_ALBUMS");
-
+    if (this.props.selected.get('artist') !== selectedArtist) {
+      this.getAlbumList(selectedArtist).then((data) => {
         this.props.dispatch({
           type: 'SET_LIBRARY_ALBUMS',
           value: data
@@ -108,17 +90,16 @@ console.log("SET_LIBRARY_ALBUMS");
     }
   }
 
-  // shouldComponentUpdate(nextProps) {
-  // return !nextProps.getIn('library', 'artists').equals(this.props.getIn('library', 'artists'));
-  // return
-    // return this.props.store.selected.artist ||
-    //        (this.props.store.selected.artist !== nextProps.store.selected.artist);
-  // }
+  shouldComponentUpdate(nextProps) {
+    return !I.is(this.props.library.get('albums'), nextProps.library.get('albums')) ||
+           !I.is(this.props.selected.get('album'), nextProps.selected.get('album'));
+  }
 }
 
 const mapStatesToProps = (store) => {
   return {
-    store: store
+    selected: store.get('selected'),
+    library: store.get('library')
   }
 };
 

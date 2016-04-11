@@ -81,7 +81,7 @@ class Controls extends React.Component {
 
 const mapStatesToProps = (store) => {
   return {
-    isPlaying: store.isPlaying
+    isPlaying: store.get('isPlaying')
   }
 };
 

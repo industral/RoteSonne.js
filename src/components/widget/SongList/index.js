@@ -1,5 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
+import I from 'immutable'
 
 import database from '../../../context/db'
 
@@ -9,10 +10,6 @@ import SongListComponent from './songListComponent'
 class SongList extends React.Component {
   constructor() {
     super();
-
-    // this.state = {
-    //   tracks: []
-    // };
   }
 
   getPlayList(props) {
@@ -21,7 +18,6 @@ class SongList extends React.Component {
         db.all('SELECT * FROM playlist WHERE albumArtist = ? and album = ?',
           [props.selected.get('artist'), props.selected.get('album')], (error, results) => {
             if (results) {
-              console.debug(results);
               resolve(results);
             } else {
               console.error(error);
@@ -35,7 +31,6 @@ class SongList extends React.Component {
   }
 
   render() {
-  // console.log(333, this.props.library, this.props.library.get('tracks'));
     return (<SongListComponent
       trackList={this.props.library.get('tracks')}
       selectedFile={this.props.selected.get('file')}
@@ -44,19 +39,22 @@ class SongList extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if  ((this.props.selected.get('album') && this.props.selected.get('artist')) && this.props.selected.get('artist') !== nextProps.selected.get('artist') ||
+    if ((this.props.selected.get('album') && this.props.selected.get('artist')) &&
+        this.props.selected.get('artist') !== nextProps.selected.get('artist') ||
         this.props.selected.get('album') !== nextProps.selected.get('album')) {
       this.getPlayList(nextProps).then((data) => {
-        // this.setState({
-        //   tracks: data
-        // });
-
         this.props.dispatch({
           type: 'SET_LIBRARY_TRACKS',
           value: data
         });
       });
     }
+  }
+
+  shouldComponentUpdate(nextState) {
+    return !I.is(nextState.library.get('tracks'), this.props.library.get('tracks')) ||
+           nextState.selected.get('file') !== this.props.selected.get('file') ||
+           nextState.playing.get('file') !== this.props.playing.get('file');
   }
 
 }

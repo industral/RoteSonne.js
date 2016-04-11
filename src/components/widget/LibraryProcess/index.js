@@ -71,7 +71,6 @@ class LibraryProcess extends React.Component {
 
       fse.walk(files)
         .on('data', (item) => {
-          console.log(item);
           if (!item.stats.isDirectory() && item.path.match(this.extensions)) {
             items.push(item.path);
           }
@@ -103,8 +102,6 @@ class LibraryProcess extends React.Component {
         };
 
         let onMetadata = (metadata) => {
-          console.log(metadata);
-
           const covertArt = metadata.coverArt ? metadata.coverArt.data : undefined;
 
           trackInfoCallback({
@@ -123,8 +120,6 @@ class LibraryProcess extends React.Component {
             onMetadata,
             onData
           });
-
-          // callback();
         };
 
         /**
@@ -138,8 +133,6 @@ class LibraryProcess extends React.Component {
             asset.emit('error', `Can't read metadata from file ${file}`);
           }, 300);
         };
-
-        console.log(file, asset);
 
         asset.on('error', onError);
         asset.get('metadata', onMetadata);
