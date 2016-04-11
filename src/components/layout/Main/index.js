@@ -1,7 +1,7 @@
 import './styles/style.scss'
 import React from 'react'
 import Controls from '../../widget/Controls'
-// import DevTools from '../../../assets/js/DevTools'
+import DevTools from '../../../assets/js/DevTools'
 
 class Layout extends React.Component {
   constructor() {
@@ -22,12 +22,11 @@ class Layout extends React.Component {
         </section>
 
         <div>
+          {process.env.REDUX ? <DevTools /> : false}
         </div>
       </div>
     )
   }
 }
-
-// <DevTools />
 
 export default Layout;

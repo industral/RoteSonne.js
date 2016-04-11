@@ -71,7 +71,6 @@ class LibraryProcess extends React.Component {
 
       fse.walk(files)
         .on('data', (item) => {
-          console.log(item);
           if (!item.stats.isDirectory() && item.path.match(this.extensions)) {
             items.push(item.path);
           }
@@ -103,8 +102,6 @@ class LibraryProcess extends React.Component {
         };
 
         let onMetadata = (metadata) => {
-          console.log(metadata);
-
           const covertArt = metadata.coverArt ? metadata.coverArt.data : undefined;
 
           trackInfoCallback({
@@ -116,15 +113,13 @@ class LibraryProcess extends React.Component {
             diskNumber: metadata.diskNumber,
             trackNumber: metadata.trackNumber,
             coverArt: covertArt
-          });
+          }, callback);
 
           this.releaseResource(asset, {
             onError,
             onMetadata,
             onData
           });
-
-          callback();
         };
 
         /**
@@ -138,8 +133,6 @@ class LibraryProcess extends React.Component {
             asset.emit('error', `Can't read metadata from file ${file}`);
           }, 300);
         };
-
-        console.log(file, asset);
 
         asset.on('error', onError);
         asset.get('metadata', onMetadata);
@@ -164,7 +157,7 @@ class LibraryProcess extends React.Component {
     asset = null;
   }
 
-  writeToDB(fileInfo) {
+  writeToDB(fileInfo, callback) {
     this.db.run('INSERT INTO `playlist` VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [null, fileInfo.artist, fileInfo.albumArtist, fileInfo.album, fileInfo.title, fileInfo.file, fileInfo.diskNumber,
         fileInfo.trackNumber], (error) => {
@@ -178,8 +171,9 @@ class LibraryProcess extends React.Component {
             if (error) {
               console.error(error);
             }
-          });
 
+            callback();
+          });
       });
   }
 

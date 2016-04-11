@@ -32,16 +32,15 @@ class SongListComponent extends React.Component {
 
     setTimeout(() => {
       this.player.play(file);
+    }, 300);
 
-      this.props.dispatch({
-        type: 'PLAY',
-        value: {
-          title: title,
-          file: file
-        }
-      });
-    }, 500);
-
+    this.props.dispatch({
+      type: 'PLAY',
+      value: {
+        title: title,
+        file: file
+      }
+    });
   }
 
   render() {
@@ -55,7 +54,7 @@ class SongListComponent extends React.Component {
             </tr>
           </thead>
           <TrackList
-            {...this.props}
+            data={this.props}
             setSelectTrack={this.setSelectTrack}
             playTrack={this.playTrack}
           />

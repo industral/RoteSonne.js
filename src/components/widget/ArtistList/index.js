@@ -2,6 +2,7 @@ import './styles/style.scss'
 
 import React from 'react'
 import {connect} from 'react-redux'
+import I from 'immutable'
 
 import AlbumCover from './AlbumCover'
 
@@ -10,10 +11,6 @@ import database from '../../../context/db'
 class ArtistList extends React.Component {
   constructor() {
     super();
-
-    this.state = {
-      artists: []
-    };
   }
 
   /**
@@ -37,7 +34,6 @@ class ArtistList extends React.Component {
       database.open((db) => {
         db.all(sql, (error, results) => {
           if (results) {
-            console.debug(results);
             resolve(results);
           } else {
             console.error(error);
@@ -58,16 +54,16 @@ class ArtistList extends React.Component {
   }
 
   render() {
-    let artistsList = this.state.artists.map((value, index) => {
-      let classList = 'list-group-item ' + (this.props.store.selected.artist === value.artist ? 'active' : '');
+    let artistsList = this.props.library.get('artists').map((value, index) => {
+      let classList = 'list-group-item ' + (this.props.selected.get('artist') === value.get('artist') ? 'active' : '');
 
       return (
-        <li className={classList} key={index} onClick={this.setSelectedArtist.bind(this, value.artist)}
-            title={value.artist}>
-          <AlbumCover {...value} />
+        <li className={classList} key={index} onClick={this.setSelectedArtist.bind(this, value.get('artist'))}
+            title={value.get('artist')}>
+          <AlbumCover data={value} />
           <div className="media-body">
-            <strong>{value.artist}</strong>
-            <p>{value.albums} albums</p>
+            <strong>{value.get('artist')}</strong>
+            <p>{value.get('albums')} albums</p>
           </div>
         </li>
       );
@@ -80,11 +76,14 @@ class ArtistList extends React.Component {
     )
   }
 
-  getListOfArtists() {
+  getListOfArtists(callback) {
     this.getPlayList().then((data) => {
-      this.setState({
-        artists: data
+      this.props.dispatch({
+        type: 'SET_LIBRARY_ARTISTS',
+        value: data
       });
+
+      callback && callback();
     });
   }
 
@@ -93,20 +92,26 @@ class ArtistList extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.store.libraryUpdated) {
-      this.getListOfArtists();
+    if (nextProps.libraryUpdated) {
+      this.getListOfArtists(() => {
+        this.props.dispatch({
+          type: 'LIBRARY_DID_UPDATE'
+        });
+      });
     }
   }
 
   shouldComponentUpdate(nextProps) {
-    return (!this.props.store.selected.artist ||
-            (this.props.store.selected.artist !== nextProps.store.selected.artist));
+    return !I.is(this.props.library.get('artists'), nextProps.library.get('artists')) ||
+           !I.is(this.props.selected.get('artist'), nextProps.selected.get('artist'));
   }
 }
 
 const mapStatesToProps = (store) => {
   return {
-    store: store
+    selected: store.get('selected'),
+    library: store.get('library'),
+    libraryUpdated: store.get('libraryUpdated')
   }
 };
 

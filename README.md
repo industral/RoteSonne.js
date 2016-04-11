@@ -31,7 +31,9 @@ $ npm i && make browser
 $ cd ../../..
 
 $ webpack -w
-$ DEBUG=1 electron app/
+$ electron app/
+$ DEBUG=1 electron app/ # with Developer toolbar
+$ DEBUG=1 REDUX=1 electron app/ # with Redux Developer toolbar
 ```
 
 

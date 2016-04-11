@@ -1,4 +1,6 @@
-const initObject = {
+import Immutable from 'immutable';
+
+const initObject = Immutable.fromJS({
   isPlaying: false,
   libraryUpdated: false,
   playing: {
@@ -12,68 +14,60 @@ const initObject = {
     album: null,
     title: null,
     file: null
+  },
+  library: {
+    artists: [],
+    albums: [],
+    tracks: []
   }
-};
+});
 
 function mainReducer(state = initObject, action) {
   switch (action.type) {
     case 'PLAY':
-      return Object.assign({}, state, {
-        isPlaying: true,
-        playing: Object.assign({}, state.playing, {
-          file: action.value.file,
-          title: action.value.title
-        }),
-        selected: Object.assign({}, state.selected, {
-          file: action.value.file,
-          title: action.value.title
-        })
-      });
+    return state.set('isPlaying', true).
+      setIn(['playing', 'file'], action.value.file).
+      setIn(['playing', 'title'], action.value.title).
+      setIn(['selected', 'file'], action.value.file).
+      setIn(['selected', 'title'], action.value.title);
 
     case 'STOP':
-      return Object.assign({}, state, {
-        isPlaying: false
-      });
+      return state.set('isPlaying', false);
 
     case 'TOGGLE_PLAY':
-      return Object.assign({}, state, {
-        isPlaying: !state.isPlaying
-      });
+      return state.set('isPlaying', !state.get('isPlaying'));
 
     case 'SET_SELECTED_ARTIST':
-      return Object.assign({}, state, {
-        selected: Object.assign({}, state.selected, {
-          artist: action.value
-        })
-      });
+      return state.setIn(['selected', 'artist'], action.value);
 
     case 'SET_SELECTED_ALBUM':
-      return Object.assign({}, state, {
-        selected: Object.assign({}, state.selected, {
-          album: action.value
-        })
-      });
+      return state.setIn(['selected', 'album'], action.value);
 
     case 'SET_SELECTED_TRACK':
-      return Object.assign({}, state, {
-        selected: Object.assign({}, state.selected, {
-          title: action.value.title,
-          file: action.value.file
-        })
-      });
+      return state.setIn(['selected', 'title'], action.value.title).
+        setIn(['selected', 'file'], action.value.file);
 
     case 'SET_PLAYING_TRACK':
-      return Object.assign({}, state, {
-        playing: Object.assign({}, state.playing, {
-          title: action.value.title,
-          file: action.value.file
-        })
-      });
+      return state.setIn(['playing', 'title'], action.value.title).
+       setIn(['playing', 'file'], action.value.file);
 
     case 'LIBRARY_UPDATED':
-      return Object.assign({}, state, {
-        libraryUpdated: true
-      });
+      return state.set('libraryUpdated', true).
+        set('selected', Immutable.Map());
+
+    case 'LIBRARY_DID_UPDATE':
+      return state.set('libraryUpdated', false);
+
+    case 'SET_LIBRARY_ARTISTS':
+      return state.setIn(['library', 'artists'], Immutable.fromJS(action.value)).
+        setIn(['library', 'albums'], Immutable.List());
+
+    case 'SET_LIBRARY_ALBUMS':
+      return state.setIn(['library', 'albums'], Immutable.fromJS(action.value)).
+        setIn(['library', 'tracks'], Immutable.List());
+
+    case 'SET_LIBRARY_TRACKS':
+      return state.setIn(['library', 'tracks'], Immutable.fromJS(action.value));
 
     default:
       return state;
