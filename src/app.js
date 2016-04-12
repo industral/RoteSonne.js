@@ -16,8 +16,6 @@ import DevTools from './assets/js/DevTools'
 
 import Player from './context/Player';
 
-console.log(process.env.REDUX);
-
 if (process.env.REDUX) {
   window._store = createStore(reducer, DevTools.instrument());
 } else {
@@ -28,19 +26,12 @@ Player.getInstance();
 
 import LibraryProcess from './components/widget/LibraryProcess'
 
-__openLibrary.cb = function() {
-
-  dialog.showOpenDialog({
-    properties: ['openDirectory']
-  }, function(files) {
-    if (files) {
-      render(
-        <Provider store={window._store}>
-          <LibraryProcess files={files} />
-        </Provider>, document.getElementById('dynamic'));
-    }
-  });
-};
+electron.ipcRenderer.on('library-selected', (e, files) => {
+  render(
+    <Provider store={window._store}>
+      <LibraryProcess files={files} />
+    </Provider>, document.getElementById('dynamic'));
+});
 
 render(
   <Provider store={window._store}>
