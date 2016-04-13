@@ -1,10 +1,18 @@
-# RoteSonne.js
+# RoteSonne.js Audio Player
 
-Audio Player using [Electron](http://electron.atom.io/), [Aurora.js]
+Cross-platform **Audio Player** written in **JavaScript** using [Electron](http://electron.atom.io/), [Aurora.js]
 (https://github.com/audiocogs/aurora.js/), [React](https://facebook.github.io/react/), 
 [Redux](https://github.com/reactjs/redux)
 
 Rewritten version of [RoteSonne](https://github.com/industral/RoteSonne)
+
+### Features
+
+**Supported formats**: FLAC, WavPack, Ogg, mp3, AAC
+
+
+![OS X](./docs/osx.png)
+
 
 ## Install
 
