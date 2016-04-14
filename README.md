@@ -2,7 +2,7 @@
 
 Cross-platform **Audio Player** written in **JavaScript** using [Electron](http://electron.atom.io/), [Aurora.js]
 (https://github.com/audiocogs/aurora.js/), [React](https://facebook.github.io/react/), 
-[Redux](https://github.com/reactjs/redux)
+[Redux](https://github.com/reactjs/redux) and [Immutable.js](https://facebook.github.io/immutable-js/) 
 
 Rewritten version of [RoteSonne](https://github.com/industral/RoteSonne)
 
